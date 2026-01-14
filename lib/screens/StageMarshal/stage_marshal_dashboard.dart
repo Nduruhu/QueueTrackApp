@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import '../../QueueModel/queue_model.dart';
+import 'package:queuetrack/Database/stage_marshal.dart';
 
 class StageMarshalDashboard extends StatefulWidget {
   const StageMarshalDashboard({super.key});
@@ -11,86 +10,84 @@ class StageMarshalDashboard extends StatefulWidget {
 }
 
 class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
-  int currentIndex=0;
-  final queueModel=QueueModel();
+  int currentIndex = 0;
   final List<BottomNavigationBarItem> navigationButtons = [
-    BottomNavigationBarItem(icon: Icon(Icons.view_agenda),label: 'view queue'),
-    BottomNavigationBarItem(icon: Icon(Icons.person),label: 'A'),
-    BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'B'),
+    BottomNavigationBarItem(icon: Icon(Icons.view_agenda), label: 'view queue'),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'A'),
+    BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'B'),
   ];
-late List <Widget> pages=[
+  late List<Widget> pages = [
     buildQueue(context),
-   Center(child: Text("A")),
-   Center(child: Text("B")),
-];
+    Center(child: Text("A")),
+    Center(child: Text("B")),
+  ];
 
-Widget buildQueue(BuildContext context){
-  return StreamBuilder(
-      stream: queueModel.fetchQueue(),
-      builder: (context,snapshot){
-        if(snapshot.hasError){
+  Widget buildQueue(BuildContext context) {
+    return StreamBuilder(
+      stream: StageMarshal().fetchQueue(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
           return Center(child: Text("Error: ${snapshot.error}"));
         }
-        if(snapshot.connectionState==ConnectionState.waiting && !snapshot.hasData){
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        final docs=snapshot.data!;
-        print("Docs Stream : ${docs}");
+        final docs = snapshot.data!;
         return ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context,index){
-              final doc=docs[index];
-              print("Doc : ${doc}");
-              return (doc['status']=='departed')?null:Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Text(index.toString()),
-                      title: Text('${doc['vehicleNumber']}'),
-                      subtitle: Text('${doc['driverName']}'),
-                      trailing: Text('${doc['createdAt']}')
-                    ),
-                    ListTile(
-                        title: Text('${doc['status']}'),
-                        trailing: TextButton(onPressed: () async {
-                          try {
-                            await queueModel.approveDriver(
-                                driverName: doc['driverName'],
-                                stamp: DateTime.now().toString(),
-                                vehicleNumber: doc['vehicleNumber']
+          itemCount: docs.length,
+          itemBuilder: (context, index) {
+            final doc = docs[index];
+            return (doc['departed'] == true)
+                ? null
+                : Card(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Text(doc['queueId'].toString()),
+                          title: Text(' Car No: ${doc['vehicleId']}'),
+                          subtitle: Text('Approved : ${doc['approved']}'),
+                          trailing: Text(
+                            ' Request date :\n${doc['queue_date'].toString()}',
+                          ),
+                        ),
+                        ListTile(
+                          leading: Text('Departed : ${doc['departed']}'),
+                          trailing: TextButton(
+                            onPressed: () async {
+                              try {
+                                await StageMarshal().approveDriver(
+                                  vehicleNumber: doc['vehicleId'],
+                                );
+                              } catch (err) {
+                                Fluttertoast.showToast(msg: err.toString());
+                              }
+                            },
+                            child: Text('Approve'),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await StageMarshal().departDriver(
+                              vehicleNumber: doc['vehicleId'],
                             );
-                          } catch (err) {
-                            print('Error :${err.toString()}');
-                            Fluttertoast.showToast(msg: "${err.toString()}");
-                          }
-                        }, child: Text('Approve'))
+                          },
+                          child: Text('Depart'),
+                        ),
+                      ],
                     ),
-                    TextButton(onPressed: () async {
-                        await queueModel.departDriver(
-                            driverName: doc['driverName'],
-                            stamp: DateTime.now().toString(),
-                            vehicleNumber: doc['vehicleNumber']
-                        );
-                    }, child: Text('Depart')),
-                  ],
-                ),
-              );
-            }
+                  );
+          },
         );
-      });
-}
+      },
+    );
+  }
 
-@override
+  @override
   void initState() {
     super.initState();
     pages;
   }
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +100,10 @@ Widget buildQueue(BuildContext context){
           currentIndex: currentIndex,
           onTap: (index) {
             setState(() {
-              currentIndex=index;
+              currentIndex = index;
             });
-          }
-        )
+          },
+        ),
       ),
     );
   }

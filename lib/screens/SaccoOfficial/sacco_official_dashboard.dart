@@ -6,14 +6,11 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-import 'package:queuetrack/QueueModel/queue_model.dart';
+import 'package:queuetrack/Database/stage_marshal.dart';
+import 'package:queuetrack/screens/SaccoOfficial/register_stage_marshal.dart';
 import 'dart:typed_data';
 import '../dashboard_helper.dart';
 import 'dart:io';
-import '../register_stage_marshal.dart';
-
-
-
 
 class SaccoOfficialDashboard extends StatelessWidget {
   const SaccoOfficialDashboard({super.key});
@@ -45,7 +42,7 @@ class SaccoOfficialDashboard extends StatelessWidget {
         builder: (_) => Scaffold(
           appBar: AppBar(title: const Text("Active Queue")),
           body: StreamBuilder(
-            stream: QueueModel().fetchQueue(),
+            stream: StageMarshal().fetchQueue(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -58,19 +55,29 @@ class SaccoOfficialDashboard extends StatelessWidget {
               return ListView.builder(
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
-                  final data = docs[index] ;
-                  return (data['status']=='departed')?null:Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.teal,
-                        child: Text(index.toString()),
-                      ),
-                      title: Text(data['vehicleNumber'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(data['driverName']),
-                      trailing:Text(data['status'])
-                    ),
-                  );
+                  final data = docs[index];
+                  return (data['status'] == 'departed')
+                      ? null
+                      : Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.teal,
+                              child: Text(index.toString()),
+                            ),
+                            title: Text(
+                              data['vehicleNumber'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(data['driverName']),
+                            trailing: Text(data['status']),
+                          ),
+                        );
                 },
               );
             },
@@ -88,16 +95,17 @@ class SaccoOfficialDashboard extends StatelessWidget {
         builder: (_) => Scaffold(
           appBar: AppBar(title: const Text("Departed Vehicles Log")),
           body: StreamBuilder(
-            stream:QueueModel().fetchQueue(),
+            stream: StageMarshal().fetchQueue(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
                 return const Center(
-                    child: Text("Error loading departed logs."));
+                  child: Text("Error loading departed logs."),
+                );
               }
-              if (!snapshot.hasData ) {
+              if (!snapshot.hasData) {
                 return const Center(child: Text("No departed records yet"));
               }
 
@@ -106,29 +114,32 @@ class SaccoOfficialDashboard extends StatelessWidget {
               return ListView.builder(
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
-                  final data =docs[index];
+                  final data = docs[index];
                   print("departed data : $data");
 
-                  return (data['status'].toString().contains('departed'))?Card(
-                    margin: const EdgeInsets.all(8),
-                    color: Colors.blueGrey.shade50,
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Text(index.toString()),
-                          title: Text(data['vehicleNumber']),
-                          subtitle: Text(data['driverName']),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text("${data['status']}   At "),
-                            Text(data['createdAt']),
-                          ],
-                        ),
-                      ],
-                    )
-                  ):null;
+                  return (data['status'].toString().contains('departed'))
+                      ? Card(
+                          margin: const EdgeInsets.all(8),
+                          color: Colors.blueGrey.shade50,
+                          child: Column(
+                            children: [
+                              ListTile(
+                                leading: Text(index.toString()),
+                                title: Text(data['vehicleNumber']),
+                                subtitle: Text(data['driverName']),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("${data['status']}   At "),
+                                  Text(data['createdAt']),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      : null;
                 },
               );
             },
@@ -149,7 +160,10 @@ class SaccoOfficialDashboard extends StatelessWidget {
         .collection('queues')
         .doc(stageId)
         .collection('vehicles')
-        .where('checkedInAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+        .where(
+          'checkedInAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+        )
         .where('checkedInAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
         .get();
 
@@ -157,7 +171,10 @@ class SaccoOfficialDashboard extends StatelessWidget {
         .collection('queues')
         .doc(stageId)
         .collection('vehicles')
-        .where('departedAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+        .where(
+          'departedAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+        )
         .where('departedAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
         .get();
 
@@ -173,7 +190,10 @@ class SaccoOfficialDashboard extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close")),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          ),
         ],
       ),
     );
@@ -190,14 +210,17 @@ class SaccoOfficialDashboard extends StatelessWidget {
         .collection('queues')
         .doc(stageId)
         .collection('vehicles')
-        .where('checkedInAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+        .where(
+          'checkedInAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+        )
         .where('checkedInAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
         .get();
 
     if (vehiclesSnapshot.docs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No records for today")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("No records for today")));
       return;
     }
 
@@ -214,7 +237,10 @@ class SaccoOfficialDashboard extends StatelessWidget {
       final departedAt = data['departedAt'];
 
       if (checkedInAt != null && departedAt != null) {
-        final diff = departedAt.toDate().difference(checkedInAt.toDate()).inMinutes;
+        final diff = departedAt
+            .toDate()
+            .difference(checkedInAt.toDate())
+            .inMinutes;
         totalWaitMinutes += diff;
         countWithWait++;
         final depHour = departedAt.toDate().hour;
@@ -226,7 +252,9 @@ class SaccoOfficialDashboard extends StatelessWidget {
         ? (totalWaitMinutes / countWithWait).toStringAsFixed(1)
         : 'N/A';
     final peakHour = hourlyDepartures.isNotEmpty
-        ? hourlyDepartures.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        ? hourlyDepartures.entries
+              .reduce((a, b) => a.value > b.value ? a : b)
+              .key
         : null;
 
     pdf.addPage(
@@ -243,9 +271,11 @@ class SaccoOfficialDashboard extends StatelessWidget {
           pw.Text("Total vehicles checked in: ${vehiclesSnapshot.size}"),
           pw.Text("Vehicles with departure records: $countWithWait"),
           pw.Text("Average waiting time: $avgWait minutes"),
-          pw.Text(peakHour != null
-              ? "Peak hour: ${peakHour.toString().padLeft(2, '0')}:00 - ${peakHour + 1}:00"
-              : "Peak hour: N/A"),
+          pw.Text(
+            peakHour != null
+                ? "Peak hour: ${peakHour.toString().padLeft(2, '0')}:00 - ${peakHour + 1}:00"
+                : "Peak hour: N/A",
+          ),
           pw.SizedBox(height: 15),
           pw.TableHelper.fromTextArray(
             headers: ["Driver", "Position", "Checked In", "Departed", "Status"],
@@ -254,7 +284,9 @@ class SaccoOfficialDashboard extends StatelessWidget {
               final driver = data['driverName'] ?? 'Unknown';
               final pos = data['position']?.toString() ?? '-';
               final checked = data['checkedInAt'] != null
-                  ? formatter.format((data['checkedInAt'] as Timestamp).toDate())
+                  ? formatter.format(
+                      (data['checkedInAt'] as Timestamp).toDate(),
+                    )
                   : 'N/A';
               final departed = data['departedAt'] != null
                   ? formatter.format((data['departedAt'] as Timestamp).toDate())
@@ -273,16 +305,19 @@ class SaccoOfficialDashboard extends StatelessWidget {
     );
     await _sendPdfByEmail(context, await pdf.save());
 
-
-
     // Ask user if they want to send the email
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Send PDF Report?"),
-        content: const Text("Would you like to email this report to the SACCO office?"),
+        content: const Text(
+          "Would you like to email this report to the SACCO office?",
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("No")),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("No"),
+          ),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
@@ -299,84 +334,80 @@ class SaccoOfficialDashboard extends StatelessWidget {
   }
 
   // -------------------- EMAIL REPORT --------------------
-Future<void> _sendPdfByEmail(BuildContext context, Uint8List pdfBytes) async {
-  try {
-// replace with your email
-// use Gmail app password
+  Future<void> _sendPdfByEmail(BuildContext context, Uint8List pdfBytes) async {
+    try {
+      // replace with your email
+      // use Gmail app password
 
-    final smtpServer = gmail('queuetrack2@gmail.com','zcckysyooeahmjcr');
+      final smtpServer = gmail('queuetrack2@gmail.com', 'zcckysyooeahmjcr');
 
-    final tempDir = Directory.systemTemp;
-    final filePath = '${tempDir.path}/Daily_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
-    final file = File(filePath);
-    await file.writeAsBytes(pdfBytes); // save the PDF locally first
+      final tempDir = Directory.systemTemp;
+      final filePath =
+          '${tempDir.path}/Daily_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      final file = File(filePath);
+      await file.writeAsBytes(pdfBytes); // save the PDF locally first
 
-    final message = Message()
-      ..from = Address('queuetrack2@gmail.com', 'Sacco Report System')
-      ..recipients.add('queuetrack2@gmail.com') // change this
-      ..subject = 'Daily Queue Report - ${DateFormat('d MMM yyyy').format(DateTime.now())}'
-      ..text = 'Attached is the daily queue report in PDF format.'
-      ..attachments = [
-        FileAttachment(file)
-          ..fileName = 'Daily_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf'
-          ..contentType = 'application/pdf'
-      ];
+      final message = Message()
+        ..from = Address('queuetrack2@gmail.com', 'Sacco Report System')
+        ..recipients.add('queuetrack2@gmail.com') // change this
+        ..subject =
+            'Daily Queue Report - ${DateFormat('d MMM yyyy').format(DateTime.now())}'
+        ..text = 'Attached is the daily queue report in PDF format.'
+        ..attachments = [
+          FileAttachment(file)
+            ..fileName =
+                'Daily_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf'
+            ..contentType = 'application/pdf',
+        ];
 
-    await send(message, smtpServer);
+      await send(message, smtpServer);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('✅ Email sent successfully!')),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('❌ Failed to send email: $e')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Email sent successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('❌ Failed to send email: $e')));
+    }
   }
-}
-
-
-
 
   // -------------------- DASHBOARD --------------------
   @override
-  Widget build(BuildContext context) => buildDashboard(
-        'Sacco Official Dashboard',
-        [
-          {
-            'title': 'View Active Queue',
-            'icon': Icons.queue,
-            'color': Colors.teal,
-            'onTap': (ctx) => _viewActiveQueue(ctx),
-          },
-          {
-            'title': 'View Departed Logs',
-            'icon': Icons.history,
-            'color': Colors.blue,
-            'onTap': (ctx) => _viewDepartedLogs(ctx),
-          },
-          {
-            'title': 'Daily Summary Report',
-            'icon': Icons.analytics,
-            'color': Colors.orange,
-            'onTap': (ctx) => _showDailySummary(ctx),
-          },
-          {
-            'title': 'Download / Email PDF Report',
-            'icon': Icons.picture_as_pdf,
-            'color': Colors.redAccent,
-            'onTap': (ctx) => _generateDailyPdf(ctx),
-          },
-          {
-            'title': 'Register Stage Marshal',
-            'icon': Icons.directions_car,
-            'color': Colors.purple,
-            'onTap': (ctx) => Navigator.push(
-              ctx,
-              MaterialPageRoute(builder: (_) => RegisterStageMarshal()),
-            ),
-          },
-
-        ],
-        context,
-      );
+  Widget build(BuildContext context) =>
+      buildDashboard('Sacco Official Dashboard', [
+        {
+          'title': 'View Active Queue',
+          'icon': Icons.queue,
+          'color': Colors.teal,
+          'onTap': (ctx) => _viewActiveQueue(ctx),
+        },
+        {
+          'title': 'View Departed Logs',
+          'icon': Icons.history,
+          'color': Colors.blue,
+          'onTap': (ctx) => _viewDepartedLogs(ctx),
+        },
+        {
+          'title': 'Daily Summary Report',
+          'icon': Icons.analytics,
+          'color': Colors.orange,
+          'onTap': (ctx) => _showDailySummary(ctx),
+        },
+        {
+          'title': 'Download / Email PDF Report',
+          'icon': Icons.picture_as_pdf,
+          'color': Colors.redAccent,
+          'onTap': (ctx) => _generateDailyPdf(ctx),
+        },
+        {
+          'title': 'Register Stage Marshal',
+          'icon': Icons.directions_car,
+          'color': Colors.purple,
+          'onTap': (ctx) => Navigator.push(
+            ctx,
+            MaterialPageRoute(builder: (_) => RegisterStageMarshal()),
+          ),
+        },
+      ], context);
 }

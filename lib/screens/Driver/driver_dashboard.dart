@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:queuetrack/QueueModel/queue_model.dart';
+import 'package:queuetrack/Database/driver.dart';
 import 'package:queuetrack/screens/Driver/maps_view.dart';
 import '../dashboard_helper.dart';
 import '../view_queue_status.dart';
 import 'driver_profile_screen.dart';
 
-
 class DriverDashboard extends StatelessWidget {
-  
-   DriverDashboard({super.key,});
-final  QueueModel queueModel=QueueModel();
-final FirebaseFirestore firestore=FirebaseFirestore.instance;
-final TextEditingController vehicleNumberController=TextEditingController();
-
+  DriverDashboard({super.key});
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final TextEditingController vehicleNumberController = TextEditingController();
 
   // ✅ View trip history
   void _viewMyHistory(BuildContext context) {
@@ -59,12 +55,16 @@ final TextEditingController vehicleNumberController=TextEditingController();
                   }
 
                   return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     color: Colors.blueGrey.shade50,
                     child: ListTile(
-                      leading: const Icon(Icons.directions_bus,
-                          color: Colors.teal),
+                      leading: const Icon(
+                        Icons.directions_bus,
+                        color: Colors.teal,
+                      ),
                       title: Text("Vehicle: $vehicle"),
                       subtitle: Text(
                         "Checked In: ${formatTime(checkedInAt)}\n"
@@ -84,76 +84,76 @@ final TextEditingController vehicleNumberController=TextEditingController();
 
   Future _checkInUi(BuildContext context) {
     return showModalBottomSheet(
-        context: context,
-        builder: (context){
-      return TextFormField(
-        controller: vehicleNumberController,
-        keyboardType: TextInputType.text,
-        decoration: const InputDecoration(
-          hintText: 'Enter vehicle number',
-          border: OutlineInputBorder(),
-        ),
-        validator: (value){
-          if(value!.isEmpty){
-            return 'Please enter a vehicle number';
-          }
-          return null;
-        },
-        onFieldSubmitted: (value){
-          queueModel.requestCheckIn(vehicleNumber: value);
-          Navigator.pop(context);
-
-        }
-      );
-    });
-  }
-  @override
-  Widget build(BuildContext context) => buildDashboard(
-        'Driver Dashboard',
-        [
-          {
-            'title': 'Check-in Stage',
-            'icon': Icons.check_circle,
-            'color': Colors.blue,
-            'onTap': (ctx) => _checkInUi(context),
-          },
-          {
-            'title': 'View Queue Status',
-            'icon': Icons.queue,
-            'color': Colors.green,
-            'onTap': (ctx) {
-              Navigator.push(
-                ctx,
-                MaterialPageRoute(builder: (_) => ViewQueueStatus()),
-              );
-            },
-          },
-          {
-            'title': 'My Trip History',
-            'icon': Icons.history,
-            'color': Colors.orange,
-            'onTap': (ctx) => _viewMyHistory(ctx),
-          },
-          {
-            'title': 'Profile',
-            'icon': Icons.person,
-            'color': Colors.purple,
-            'onTap': (ctx) {
-              Navigator.push(
-                ctx,
-                MaterialPageRoute(builder: (_) => const DriverProfileScreen()));
-            },
-          },
-          {
-            'title': 'Maps View',
-            'icon': Icons.map_outlined,
-            'color': Colors.lightBlue,
-            'onTap': (ctx) {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> MapsView()));
+      context: context,
+      builder: (context) {
+        return TextFormField(
+          controller: vehicleNumberController,
+          keyboardType: TextInputType.text,
+          decoration: const InputDecoration(
+            hintText: 'Enter vehicle number',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value!.isEmpty) {
+              return 'Please enter a vehicle number';
             }
-          }
+            return null;
+          },
+          onFieldSubmitted: (value) {
+            Driver().driverCheckIn(vehicleNumber: value);
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
 
-        ],
-        context,
-      );
+  @override
+  Widget build(BuildContext context) => buildDashboard('Driver Dashboard', [
+    {
+      'title': 'Check-in Stage',
+      'icon': Icons.check_circle,
+      'color': Colors.blue,
+      'onTap': (ctx) => _checkInUi(context),
+    },
+    {
+      'title': 'View Queue Status',
+      'icon': Icons.queue,
+      'color': Colors.green,
+      'onTap': (ctx) {
+        Navigator.push(
+          ctx,
+          MaterialPageRoute(builder: (_) => ViewQueueStatus()),
+        );
+      },
+    },
+    {
+      'title': 'My Trip History',
+      'icon': Icons.history,
+      'color': Colors.orange,
+      'onTap': (ctx) => _viewMyHistory(ctx),
+    },
+    {
+      'title': 'Profile',
+      'icon': Icons.person,
+      'color': Colors.purple,
+      'onTap': (ctx) {
+        Navigator.push(
+          ctx,
+          MaterialPageRoute(builder: (_) => const DriverProfileScreen()),
+        );
+      },
+    },
+    {
+      'title': 'Maps View',
+      'icon': Icons.map_outlined,
+      'color': Colors.lightBlue,
+      'onTap': (ctx) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MapsView()),
+        );
+      },
+    },
+  ], context);
 }
