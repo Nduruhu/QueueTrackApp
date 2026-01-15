@@ -61,4 +61,12 @@ class SaccoOfficial {
       Fluttertoast.showToast(msg: anyOtherError.toString());
     }
   }
+
+  Stream viewDepartedLogs() {
+    return supabase
+        .from('QUEUE')
+        .stream(primaryKey: ['queueId'])
+        .eq('departed', true)
+        .order('queue_date', ascending: true);
+  }
 }

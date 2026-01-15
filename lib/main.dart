@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:queuetrack/Database/driver.dart';
@@ -19,9 +20,9 @@ void main() async {
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnZjdnJla25peGxvZmVwYWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNzM0NTksImV4cCI6MjA4MTc0OTQ1OX0.LWf0H0E7ZgT6OUEVOrtknhXRKg5cBO5Eigw9a4jllmg',
       url: 'https://bnnvcvreknixlofepafz.supabase.co',
     );
-    // OneSignal.initialize('fb4a4b27-a6d7-44d4-ab55-d418d082ba74');
-    // OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    // await OneSignal.Notifications.requestPermission(true);
+    OneSignal.initialize('fb4a4b27-a6d7-44d4-ab55-d418d082ba74');
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    await OneSignal.Notifications.requestPermission(true);
 
     runApp(
       MultiProvider(

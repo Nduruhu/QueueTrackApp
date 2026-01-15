@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-Widget buildDashboard(String title, List<Map<String, dynamic>> items, BuildContext context) {
+Widget buildDashboard(
+  String title,
+  List<Map<String, dynamic>> items,
+  BuildContext context,
+) {
   return Scaffold(
-    appBar: AppBar(title: Text(title)),
+    backgroundColor: Colors.brown[300],
+    appBar: AppBar(title: Text(title), backgroundColor: Colors.amberAccent),
     body: ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, i) {
@@ -17,9 +22,16 @@ Widget buildDashboard(String title, List<Map<String, dynamic>> items, BuildConte
             leading: Icon(items[i]['icon'], color: Colors.white),
             title: Text(
               items[i]['title'],
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
+            trailing: const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.white,
+            ),
             // Pass context to the onTap if provided
             onTap: () {
               if (items[i]['onTap'] != null) {

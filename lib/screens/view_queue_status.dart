@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:queuetrack/Database/queue.dart';
+import 'package:queuetrack/Database/stage_marshal.dart';
 
 class ViewQueueStatus extends StatelessWidget {
   const ViewQueueStatus({super.key});
@@ -8,8 +7,8 @@ class ViewQueueStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Queue Status")),
-      body: FutureBuilder(
-        future: Queue().getQueue(),
+      body: StreamBuilder(
+        stream: StageMarshal().fetchApprovedQueue(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -20,30 +19,38 @@ class ViewQueueStatus extends StatelessWidget {
           if (snapshot.hasError) {
             return Center(child: Text('${snapshot.error}'));
           }
-          final drivers = snapshot.data!;
-
+          final drivers = snapshot.data! as List;
+          if (drivers.isEmpty) {
+            return Center(child: Text('No Approved Vehicles'));
+          }
           return ListView.builder(
             itemCount: drivers.length,
             itemBuilder: (context, index) {
               final driver = drivers[index];
-              print("Driver : $driver");
               return Card(
-                margin: const EdgeInsets.all(8),
                 child: Column(
                   children: [
                     ListTile(
-                      leading: Text(index.toString()),
+                      leading: Text(
+                        index.toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
                       title: Text(
                         "${driver['vehicleId']}",
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text('Departed : ${driver['departed']}'),
-                      trailing: Text('date : ${driver['queue_date']}'),
+                      subtitle: Text(
+                        'date : ${driver['queue_date'].toString().split('.')[0]}',
+                      ),
                     ),
                     ListTile(
-                      subtitle: Text(
+                      title: Text(
                         ' Approved : ${driver['approved'].toString()}',
                       ),
+                      subtitle: Text('Departed : ${driver['departed']}'),
                     ),
                   ],
                 ),

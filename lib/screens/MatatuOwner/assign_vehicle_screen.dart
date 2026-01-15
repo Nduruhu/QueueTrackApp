@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queuetrack/Database/driver.dart';
+import 'package:queuetrack/Database/matatu_owner.dart';
 
 class AssignVehicleScreen extends StatefulWidget {
   const AssignVehicleScreen({super.key});
@@ -15,7 +16,6 @@ class _AssignVehicleScreenState extends State<AssignVehicleScreen> {
   final TextEditingController driverEmailController = TextEditingController();
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
-  final db = Driver();
 
   Widget _textFields({
     required int length,
@@ -96,7 +96,7 @@ class _AssignVehicleScreenState extends State<AssignVehicleScreen> {
                         if (_formKey.currentState!.validate()) {
                           isLoading = true;
                           //add the method here ya kujaza kwa firebase db
-                          db.addDriver(
+                          MatatuOwner().addDriver(
                             name: driverNameController.text,
                             email: driverEmailController.text,
                             vehicleId: vehicleNumberController.text,

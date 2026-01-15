@@ -6,8 +6,10 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:queuetrack/Database/sacco_official.dart';
 import 'package:queuetrack/Database/stage_marshal.dart';
 import 'package:queuetrack/screens/SaccoOfficial/register_stage_marshal.dart';
+import 'package:queuetrack/screens/SaccoOfficial/view_departed_logs.dart';
 import 'dart:typed_data';
 import '../dashboard_helper.dart';
 import 'dart:io';
@@ -42,7 +44,7 @@ class SaccoOfficialDashboard extends StatelessWidget {
         builder: (_) => Scaffold(
           appBar: AppBar(title: const Text("Active Queue")),
           body: StreamBuilder(
-            stream: StageMarshal().fetchQueue(),
+            stream: StageMarshal().fetchApprovedQueue(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -51,7 +53,10 @@ class SaccoOfficialDashboard extends StatelessWidget {
                 return const Center(child: Text("No active vehicles in queue"));
               }
 
-              final docs = snapshot.data!;
+              final docs = snapshot.data! as List;
+              if (docs.isEmpty) {
+                return Center(child: Text('No queue data'));
+              }
               return ListView.builder(
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
@@ -78,68 +83,6 @@ class SaccoOfficialDashboard extends StatelessWidget {
                             trailing: Text(data['status']),
                           ),
                         );
-                },
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  // -------------------- DEPARTED LOGS --------------------
-  void _viewDepartedLogs(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text("Departed Vehicles Log")),
-          body: StreamBuilder(
-            stream: StageMarshal().fetchQueue(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return const Center(
-                  child: Text("Error loading departed logs."),
-                );
-              }
-              if (!snapshot.hasData) {
-                return const Center(child: Text("No departed records yet"));
-              }
-
-              final docs = snapshot.data!;
-              print("departed data : ${docs.first}");
-              return ListView.builder(
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  final data = docs[index];
-                  print("departed data : $data");
-
-                  return (data['status'].toString().contains('departed'))
-                      ? Card(
-                          margin: const EdgeInsets.all(8),
-                          color: Colors.blueGrey.shade50,
-                          child: Column(
-                            children: [
-                              ListTile(
-                                leading: Text(index.toString()),
-                                title: Text(data['vehicleNumber']),
-                                subtitle: Text(data['driverName']),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text("${data['status']}   At "),
-                                  Text(data['createdAt']),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                      : null;
                 },
               );
             },
@@ -386,7 +329,10 @@ class SaccoOfficialDashboard extends StatelessWidget {
           'title': 'View Departed Logs',
           'icon': Icons.history,
           'color': Colors.blue,
-          'onTap': (ctx) => _viewDepartedLogs(ctx),
+          'onTap': (ctx) => Navigator.push(
+            ctx,
+            MaterialPageRoute(builder: (ctx) => ViewDepartedLogs()),
+          ),
         },
         {
           'title': 'Daily Summary Report',

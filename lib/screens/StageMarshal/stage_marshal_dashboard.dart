@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:queuetrack/Database/stage_marshal.dart';
+import 'package:queuetrack/screens/view_queue_status.dart';
 
 class StageMarshalDashboard extends StatefulWidget {
   const StageMarshalDashboard({super.key});
@@ -12,19 +13,14 @@ class StageMarshalDashboard extends StatefulWidget {
 class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
   int currentIndex = 0;
   final List<BottomNavigationBarItem> navigationButtons = [
-    BottomNavigationBarItem(icon: Icon(Icons.view_agenda), label: 'view queue'),
-    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'A'),
-    BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'B'),
+    BottomNavigationBarItem(icon: Icon(Icons.view_agenda), label: 'Raw Queue'),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Approved Queue'),
   ];
-  late List<Widget> pages = [
-    buildQueue(context),
-    Center(child: Text("A")),
-    Center(child: Text("B")),
-  ];
+  late List<Widget> pages = [buildRawQueue(context), ViewQueueStatus()];
 
-  Widget buildQueue(BuildContext context) {
+  Widget buildRawQueue(BuildContext context) {
     return StreamBuilder(
-      stream: StageMarshal().fetchQueue(),
+      stream: StageMarshal().fetchRawQueue(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(child: Text("Error: ${snapshot.error}"));
@@ -46,33 +42,44 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
                         ListTile(
                           leading: Text(doc['queueId'].toString()),
                           title: Text(' Car No: ${doc['vehicleId']}'),
-                          subtitle: Text('Approved : ${doc['approved']}'),
-                          trailing: Text(
-                            ' Request date :\n${doc['queue_date'].toString()}',
+                          subtitle: Text(
+                            ' Request date : ${doc['queue_date'].toString().split('.')[0]}',
                           ),
                         ),
                         ListTile(
-                          leading: Text('Departed : ${doc['departed']}'),
-                          trailing: TextButton(
-                            onPressed: () async {
-                              try {
-                                await StageMarshal().approveDriver(
-                                  vehicleNumber: doc['vehicleId'],
-                                );
-                              } catch (err) {
-                                Fluttertoast.showToast(msg: err.toString());
-                              }
-                            },
-                            child: Text('Approve'),
-                          ),
+                          title: Text('Departed : ${doc['departed']}'),
+                          subtitle: Text('Approved : ${doc['approved']}'),
                         ),
-                        TextButton(
-                          onPressed: () async {
-                            await StageMarshal().departDriver(
-                              vehicleNumber: doc['vehicleId'],
-                            );
-                          },
-                          child: Text('Depart'),
+
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: doc['approved'] == false
+                                  ? () async {
+                                      try {
+                                        await StageMarshal().approveDriver(
+                                          vehicleNumber: doc['vehicleId'],
+                                        );
+                                      } catch (err) {
+                                        Fluttertoast.showToast(
+                                          msg: err.toString(),
+                                        );
+                                      }
+                                    }
+                                  : null,
+                              child: Text('Approve'),
+                            ),
+                            TextButton(
+                              onPressed: doc['approved'] == true
+                                  ? () async {
+                                      await StageMarshal().departDriver(
+                                        vehicleNumber: doc['vehicleId'],
+                                      );
+                                    }
+                                  : null,
+                              child: Text('Depart'),
+                            ),
+                          ],
                         ),
                       ],
                     ),

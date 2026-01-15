@@ -6,27 +6,6 @@ class Driver extends ChangeNotifier {
   final supabase = Supabase.instance.client;
   late final int currentUserId;
 
-  Future addDriver({
-    required String name,
-    required String email,
-    required String vehicleId,
-    required int nationalId,
-  }) async {
-    try {
-      await supabase.from('DRIVER').insert({
-        'nationalId': nationalId,
-        'vehicleId': vehicleId,
-        'email': email,
-        'name': name,
-      });
-      Fluttertoast.showToast(msg: 'Driver assigned successfully');
-    } on PostgrestException catch (dbError) {
-      Fluttertoast.showToast(msg: 'Error : ${dbError.message}');
-    } catch (anyOtherError) {
-      Fluttertoast.showToast(msg: 'Type Error: ${anyOtherError.toString()}');
-    }
-  }
-
   Future signInDriver({required String email, required int id}) async {
     try {
       final response = await supabase
@@ -52,8 +31,12 @@ class Driver extends ChangeNotifier {
     try {
       await supabase.from('QUEUE').insert({'vehicleId': vehicleNumber});
       Fluttertoast.showToast(msg: 'Check in Success');
-    } on PostgrestException {
-      Fluttertoast.showToast(msg: 'Vehicle already requested check in');
+    } on PostgrestException catch (dbError) {
+      if (dbError.message.contains('violates')) {
+        Fluttertoast.showToast(msg: 'Unregistered vehicle or Already Exists.');
+      } else {
+        Fluttertoast.showToast(msg: dbError.message);
+      }
     } catch (error) {
       Fluttertoast.showToast(msg: error.toString());
     }
@@ -61,10 +44,11 @@ class Driver extends ChangeNotifier {
 
   Future getDriverInfo() async {
     Fluttertoast.showToast(msg: 'current id : $currentUserId');
-    return supabase
+    final info = supabase
         .from('DRIVER')
         .select('*')
         .eq('nationalId', currentUserId)
         .maybeSingle();
+    return info;
   }
 }

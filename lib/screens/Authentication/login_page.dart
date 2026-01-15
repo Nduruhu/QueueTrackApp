@@ -254,17 +254,7 @@ class _LoginPageState extends State<LoginPage> {
                                           ),
                                         );
                                         isLoading = !isLoading;
-                                      } else {
-                                        Fluttertoast.showToast(
-                                          msg: 'Wrong email or password',
-                                        );
-                                        isLoading = !isLoading;
                                       }
-                                    } else {
-                                      Fluttertoast.showToast(
-                                        msg: 'Unknown user role',
-                                      );
-                                      isLoading = !isLoading;
                                     }
                                   }
                                 },

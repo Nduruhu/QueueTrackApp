@@ -25,10 +25,19 @@ class StageMarshal {
   }
 
   //fetch data ya queue
-  Stream<List<Map<String, dynamic>>> fetchQueue() {
+  Stream<List<Map<String, dynamic>>> fetchRawQueue() {
     return supabase
         .from('QUEUE')
         .stream(primaryKey: ['queueId'])
+        .order('queue_date', ascending: true)
+        .map((rows) => rows);
+  }
+
+  Stream<List<Map<String, dynamic>>> fetchApprovedQueue() {
+    return supabase
+        .from('QUEUE')
+        .stream(primaryKey: ['queueId'])
+        .eq('approved', true)
         .order('queue_date', ascending: true)
         .map((rows) => rows);
   }
