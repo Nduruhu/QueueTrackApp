@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:queuetrack/Database/driver.dart';
 import 'package:queuetrack/Database/matatu_owner.dart';
 
 class AssignVehicleScreen extends StatefulWidget {

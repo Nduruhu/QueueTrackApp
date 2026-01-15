@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:queuetrack/screens/MatatuOwner/my_vehicle_logs_screen.dart';
-import 'package:queuetrack/screens/MatatuOwner/track_trip_frequency.dart';
 import '../dashboard_helper.dart';
 import 'assign_vehicle_screen.dart';
 

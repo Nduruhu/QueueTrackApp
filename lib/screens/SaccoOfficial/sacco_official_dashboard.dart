@@ -6,7 +6,6 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-import 'package:queuetrack/Database/sacco_official.dart';
 import 'package:queuetrack/Database/stage_marshal.dart';
 import 'package:queuetrack/screens/SaccoOfficial/register_stage_marshal.dart';
 import 'package:queuetrack/screens/SaccoOfficial/view_departed_logs.dart';
