@@ -30,7 +30,7 @@ class _ViewDepartedLogsState extends State<ViewDepartedLogs> {
           if (docs.isEmpty) {
             return Center(child: Text('No departed logs '));
           }
-          print("departed data : ${docs}");
+          print("departed data : $docs");
           return ListView.builder(
             itemCount: docs.length,
             itemBuilder: (context, index) {
