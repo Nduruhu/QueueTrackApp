@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
+
 import 'package:queuetrack/Database/stage_marshal.dart';
+import 'package:queuetrack/pdf_logs/get_pdf_data.dart';
 import 'package:queuetrack/screens/SaccoOfficial/register_stage_marshal.dart';
 import 'package:queuetrack/screens/SaccoOfficial/view_departed_logs.dart';
-import 'dart:typed_data';
 import '../dashboard_helper.dart';
-import 'dart:io';
 
 class SaccoOfficialDashboard extends StatelessWidget {
   const SaccoOfficialDashboard({super.key});
@@ -19,21 +12,6 @@ class SaccoOfficialDashboard extends StatelessWidget {
   final String stageId = 'main_stage';
 
   // -------------------- UTILITIES --------------------
-  String formatDate(dynamic timestamp) {
-    if (timestamp == null || timestamp is! Timestamp) return 'N/A';
-    final date = timestamp.toDate();
-    return DateFormat('d/M/yyyy  h:mm a').format(date);
-  }
-
-  String timeAgo(dynamic timestamp) {
-    if (timestamp is! Timestamp) return '';
-    final now = DateTime.now();
-    final diff = now.difference(timestamp.toDate());
-    if (diff.inMinutes < 1) return "just now";
-    if (diff.inMinutes < 60) return "${diff.inMinutes} min ago";
-    if (diff.inHours < 24) return "${diff.inHours} hr ago";
-    return "${diff.inDays} day${diff.inDays > 1 ? 's' : ''} ago";
-  }
 
   // -------------------- ACTIVE QUEUE --------------------
   void _viewActiveQueue(BuildContext context) {
@@ -51,37 +29,41 @@ class SaccoOfficialDashboard extends StatelessWidget {
               if (!snapshot.hasData) {
                 return const Center(child: Text("No active vehicles in queue"));
               }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error : ${snapshot.error.toString()}'),
+                );
+              }
 
               final docs = snapshot.data! as List;
               if (docs.isEmpty) {
                 return Center(child: Text('No queue data'));
               }
+              print('docs is :$docs');
               return ListView.builder(
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
                   final data = docs[index];
-                  return (data['status'] == 'departed')
-                      ? null
-                      : Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.teal,
-                              child: Text(index.toString()),
-                            ),
-                            title: Text(
-                              data['vehicleNumber'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(data['driverName']),
-                            trailing: Text(data['status']),
-                          ),
-                        );
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.teal,
+                        child: Text(index.toString()),
+                      ),
+                      title: Text(
+                        data['vehicleId'],
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        "date : ${data['queue_date'].toString().split('T')[0]}\ntime : ${data['queue_date'].toString().split('T')[1].split('.')[0]}",
+                      ),
+                      trailing: Icon(Icons.person),
+                    ),
+                  );
                 },
               );
             },
@@ -89,229 +71,6 @@ class SaccoOfficialDashboard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // -------------------- DAILY SUMMARY --------------------
-  Future<void> _showDailySummary(BuildContext context) async {
-    final firestore = FirebaseFirestore.instance;
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    final checkIns = await firestore
-        .collection('queues')
-        .doc(stageId)
-        .collection('vehicles')
-        .where(
-          'checkedInAt',
-          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
-        )
-        .where('checkedInAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
-        .get();
-
-    final departures = await firestore
-        .collection('queues')
-        .doc(stageId)
-        .collection('vehicles')
-        .where(
-          'departedAt',
-          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
-        )
-        .where('departedAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
-        .get();
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Today's Summary"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Checked-ins today: ${checkIns.size}"),
-            Text("Departures today: ${departures.size}"),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // -------------------- GENERATE & EMAIL PDF --------------------
-  Future<void> _generateDailyPdf(BuildContext context) async {
-    final firestore = FirebaseFirestore.instance;
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    final vehiclesSnapshot = await firestore
-        .collection('queues')
-        .doc(stageId)
-        .collection('vehicles')
-        .where(
-          'checkedInAt',
-          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
-        )
-        .where('checkedInAt', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
-        .get();
-
-    if (vehiclesSnapshot.docs.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("No records for today")));
-      return;
-    }
-
-    final pdf = pw.Document();
-    final formatter = DateFormat('d/M/yyyy  h:mm a');
-
-    num totalWaitMinutes = 0;
-    int countWithWait = 0;
-    final Map<int, int> hourlyDepartures = {};
-
-    for (var doc in vehiclesSnapshot.docs) {
-      final data = doc.data();
-      final checkedInAt = data['checkedInAt'];
-      final departedAt = data['departedAt'];
-
-      if (checkedInAt != null && departedAt != null) {
-        final diff = departedAt
-            .toDate()
-            .difference(checkedInAt.toDate())
-            .inMinutes;
-        totalWaitMinutes += diff;
-        countWithWait++;
-        final depHour = departedAt.toDate().hour;
-        hourlyDepartures[depHour] = (hourlyDepartures[depHour] ?? 0) + 1;
-      }
-    }
-
-    final avgWait = countWithWait > 0
-        ? (totalWaitMinutes / countWithWait).toStringAsFixed(1)
-        : 'N/A';
-    final peakHour = hourlyDepartures.isNotEmpty
-        ? hourlyDepartures.entries
-              .reduce((a, b) => a.value > b.value ? a : b)
-              .key
-        : null;
-
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) => [
-          pw.Center(
-            child: pw.Text(
-              "Daily Queue Report - ${DateFormat('d MMM yyyy').format(now)}",
-              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-            ),
-          ),
-          pw.SizedBox(height: 15),
-          pw.Text("Total vehicles checked in: ${vehiclesSnapshot.size}"),
-          pw.Text("Vehicles with departure records: $countWithWait"),
-          pw.Text("Average waiting time: $avgWait minutes"),
-          pw.Text(
-            peakHour != null
-                ? "Peak hour: ${peakHour.toString().padLeft(2, '0')}:00 - ${peakHour + 1}:00"
-                : "Peak hour: N/A",
-          ),
-          pw.SizedBox(height: 15),
-          pw.TableHelper.fromTextArray(
-            headers: ["Driver", "Position", "Checked In", "Departed", "Status"],
-            data: vehiclesSnapshot.docs.map((doc) {
-              final data = doc.data();
-              final driver = data['driverName'] ?? 'Unknown';
-              final pos = data['position']?.toString() ?? '-';
-              final checked = data['checkedInAt'] != null
-                  ? formatter.format(
-                      (data['checkedInAt'] as Timestamp).toDate(),
-                    )
-                  : 'N/A';
-              final departed = data['departedAt'] != null
-                  ? formatter.format((data['departedAt'] as Timestamp).toDate())
-                  : 'N/A';
-              final status = data['status'] ?? '-';
-              return [driver, pos, checked, departed, status];
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-      name: "Daily_Report_${DateFormat('yyyyMMdd').format(now)}.pdf",
-    );
-    await _sendPdfByEmail(context, await pdf.save());
-
-    // Ask user if they want to send the email
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Send PDF Report?"),
-        content: const Text(
-          "Would you like to email this report to the SACCO office?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("No"),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _sendPdfByEmail(context, await pdf.save());
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("📧 Report emailed successfully")),
-              );
-            },
-            child: const Text("Yes, Send"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // -------------------- EMAIL REPORT --------------------
-  Future<void> _sendPdfByEmail(BuildContext context, Uint8List pdfBytes) async {
-    try {
-      // replace with your email
-      // use Gmail app password
-
-      final smtpServer = gmail('queuetrack2@gmail.com', 'zcckysyooeahmjcr');
-
-      final tempDir = Directory.systemTemp;
-      final filePath =
-          '${tempDir.path}/Daily_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
-      final file = File(filePath);
-      await file.writeAsBytes(pdfBytes); // save the PDF locally first
-
-      final message = Message()
-        ..from = Address('queuetrack2@gmail.com', 'Sacco Report System')
-        ..recipients.add('queuetrack2@gmail.com') // change this
-        ..subject =
-            'Daily Queue Report - ${DateFormat('d MMM yyyy').format(DateTime.now())}'
-        ..text = 'Attached is the daily queue report in PDF format.'
-        ..attachments = [
-          FileAttachment(file)
-            ..fileName =
-                'Daily_Report_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf'
-            ..contentType = 'application/pdf',
-        ];
-
-      await send(message, smtpServer);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Email sent successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('❌ Failed to send email: $e')));
-    }
   }
 
   // -------------------- DASHBOARD --------------------
@@ -337,13 +96,16 @@ class SaccoOfficialDashboard extends StatelessWidget {
           'title': 'Daily Summary Report',
           'icon': Icons.analytics,
           'color': Colors.orange,
-          'onTap': (ctx) => _showDailySummary(ctx),
+          'onTap': (ctx) => (ctx),
         },
         {
           'title': 'Download / Email PDF Report',
           'icon': Icons.picture_as_pdf,
           'color': Colors.redAccent,
-          'onTap': (ctx) => _generateDailyPdf(ctx),
+          'onTap': (ctx) => GetPdfData().createPdfDocument(
+            pdfName: 'DailyReport',
+            context: ctx,
+          ),
         },
         {
           'title': 'Register Stage Marshal',

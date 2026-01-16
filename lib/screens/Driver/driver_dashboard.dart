@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:queuetrack/Database/driver.dart';
 import 'package:queuetrack/screens/Driver/maps_view.dart';
 import '../dashboard_helper.dart';
@@ -9,78 +7,9 @@ import 'driver_profile_screen.dart';
 
 class DriverDashboard extends StatelessWidget {
   DriverDashboard({super.key});
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final TextEditingController vehicleNumberController = TextEditingController();
+ final TextEditingController vehicleNumberController = TextEditingController();
 
-  // ✅ View trip history
-  void _viewMyHistory(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text("My Trip History")),
-          body: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('queues')
-                .doc('main_stage')
-                .collection('vehicles')
-                .where('driverId', isEqualTo: user.uid)
-                .orderBy('checkedInAt', descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text("No trip history found."));
-              }
-
-              final docs = snapshot.data!.docs;
-              return ListView.builder(
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  final data = docs[index].data() as Map<String, dynamic>;
-                  final vehicle = data['vehicleNumber'] ?? 'N/A';
-                  final status = data['status'] ?? '-';
-                  final checkedInAt = data['checkedInAt'];
-                  final departedAt = data['departedAt'];
-
-                  String formatTime(dynamic t) {
-                    if (t == null || t is! Timestamp) return 'N/A';
-                    final date = t.toDate();
-                    return "${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}";
-                  }
-
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    color: Colors.blueGrey.shade50,
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.directions_bus,
-                        color: Colors.teal,
-                      ),
-                      title: Text("Vehicle: $vehicle"),
-                      subtitle: Text(
-                        "Checked In: ${formatTime(checkedInAt)}\n"
-                        "Departed: ${formatTime(departedAt)}\n"
-                        "Status: $status",
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
+ 
 
   Future _checkInUi(BuildContext context) {
     return showModalBottomSheet(
@@ -131,7 +60,7 @@ class DriverDashboard extends StatelessWidget {
       'title': 'My Trip History',
       'icon': Icons.history,
       'color': Colors.orange,
-      'onTap': (ctx) => _viewMyHistory(ctx),
+      'onTap': (ctx) => (ctx),
     },
     {
       'title': 'Profile',
