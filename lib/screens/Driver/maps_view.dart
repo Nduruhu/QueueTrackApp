@@ -1,67 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-class MapsView extends StatefulWidget {
-  const MapsView({super.key});
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 
-  @override
-  State<MapsView> createState() => _MapsViewState();
-}
-
-class _MapsViewState extends State<MapsView> {
-  //initialize webview controller
-  late final WebViewController controller;
-  //url for opening google maps
-  final String urlMaps = 'https://maps.google.com/';
-
-
-  //function to implement webview
-  void _loadWebview() {
-    try{
-    controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-
-      ..loadRequest(Uri.parse(urlMaps))
-
-      ..setNavigationDelegate(NavigationDelegate(
-        onProgress: (int progress) {
-          // Update loading bar.
-        },
-        onHttpError: (error) {
-          // Handle error.
-          Fluttertoast.showToast(
-              msg: 'Error navigating to  ${error.response?.uri}');
-        },
-        onPageStarted: (String url) {
-          Fluttertoast.showToast(msg: "loading Google Maps");
-        },
-        onPageFinished: (String url) {
-          Fluttertoast.showToast(msg: "Google Maps loaded");
-        },
-      )
+class MapsViewState {
+  // permission and psition
+  Future<void> openGoogleMaps() async {
+    try {
+      final LocationPermission hasPermission =
+          await Geolocator.checkPermission();
+      if (hasPermission == LocationPermission.denied ||
+          hasPermission == LocationPermission.deniedForever) {
+        final permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Fluttertoast.showToast(msg: 'Cant Proceed without permission');
+          return;
+        }
+        return;
+      }
+      //position
+      final Position position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
       );
-    }catch(err){
-      Fluttertoast.showToast(msg: "Error : ${err.toString()}");
+      final latitude = position.latitude;
+      final longitude = position.longitude;
+      final Uri googleMapsUri = Uri.parse(
+        'geo:$latitude,$longitude?q=$latitude,$longitude(Current+Location)',
+      );
+
+      final canLaunch = await canLaunchUrl(googleMapsUri);
+      if (canLaunch == true) {
+        Fluttertoast.showToast(msg: 'Opening Google Maps');
+        await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (err) {
+      print('Launch error : ${err.toString()}');
+      Fluttertoast.showToast(msg: err.toString());
     }
-  }
-
-  @override
-  void initState(){
-    super.initState();
-    _loadWebview();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Maps View'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: WebViewWidget(controller: controller),
-      )
-
-    );
   }
 }

@@ -93,17 +93,11 @@ class SaccoOfficialDashboard extends StatelessWidget {
           ),
         },
         {
-          'title': 'Daily Summary Report',
-          'icon': Icons.analytics,
-          'color': Colors.orange,
-          'onTap': (ctx) => (ctx),
-        },
-        {
           'title': 'Download / Email PDF Report',
           'icon': Icons.picture_as_pdf,
           'color': Colors.redAccent,
           'onTap': (ctx) => GetPdfData().createPdfDocument(
-            pdfName: 'DailyReport',
+            pdfName: 'QueueTrackReport',
             context: ctx,
           ),
         },

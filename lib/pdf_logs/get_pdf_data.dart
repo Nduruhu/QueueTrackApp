@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -103,10 +101,19 @@ class GetPdfData {
 
       // 4. Show system preview / save / share dialog
       await Printing.layoutPdf(
-        name: '${pdfName.toString()}/ ${DateTime.now()}',
+        name:
+            '${pdfName.toString()}-${DateTime.now().toString().split(' ')[0]}',
         onLayout: (PdfPageFormat format) async => pf.save(),
       );
+      final pdfBytes = await pf.save();
+      await Printing.sharePdf(
+        filename: pdfName,
+        bytes: pdfBytes,
+        subject: 'Queue Track Daily Report',
+        body: "Attached is today's report.",
+      );
     } catch (err) {
+      Fluttertoast.showToast(msg: err.toString());
       print('PDF Error: $err');
     }
   }

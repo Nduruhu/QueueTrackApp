@@ -7,9 +7,7 @@ import 'driver_profile_screen.dart';
 
 class DriverDashboard extends StatelessWidget {
   DriverDashboard({super.key});
- final TextEditingController vehicleNumberController = TextEditingController();
-
- 
+  final TextEditingController vehicleNumberController = TextEditingController();
 
   Future _checkInUi(BuildContext context) {
     return showModalBottomSheet(
@@ -78,10 +76,7 @@ class DriverDashboard extends StatelessWidget {
       'icon': Icons.map_outlined,
       'color': Colors.lightBlue,
       'onTap': (ctx) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MapsView()),
-        );
+        MapsViewState().openGoogleMaps();
       },
     },
   ], context);
