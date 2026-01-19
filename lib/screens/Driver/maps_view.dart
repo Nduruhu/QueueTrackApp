@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
@@ -34,7 +33,6 @@ class MapsViewState {
         await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
       }
     } catch (err) {
-      print('Launch error : ${err.toString()}');
       Fluttertoast.showToast(msg: err.toString());
     }
   }
