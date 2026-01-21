@@ -6,15 +6,19 @@ class Driver extends ChangeNotifier {
   final supabase = Supabase.instance.client;
   late final int currentUserId;
 
-  Future signInDriver({required String email, required int id}) async {
+  Future signInDriver({required String vehicleId, required int id}) async {
     try {
       final response = await supabase
           .from('DRIVER')
           .select('*')
           .eq('nationalId', id)
-          .eq('email', email)
+          .eq('vehicleId', vehicleId)
           .maybeSingle();
-      if (response!['nationalId'] != null && response['nationalId'] == id) {
+      if (response == null) {
+        Fluttertoast.showToast(msg: 'Login Failed');
+        return false;
+      }
+      if (response['vehicleId'] == vehicleId && response['nationalId'] == id) {
         currentUserId = response['nationalId'];
         Fluttertoast.showToast(msg: 'Login Success');
         notifyListeners();

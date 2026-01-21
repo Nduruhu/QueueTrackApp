@@ -15,6 +15,7 @@ class MapsViewState {
           Fluttertoast.showToast(msg: 'Cant Proceed without permission');
           return;
         }
+      
         return;
       }
       //position

@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController stageMarshalIdController =
       TextEditingController();
   final TextEditingController driverNameController = TextEditingController();
-  final TextEditingController stageMarshalNameController =
+  final TextEditingController stageMarshalEmailController =
       TextEditingController();
   final TextEditingController vehicleNumberController = TextEditingController();
 
@@ -38,11 +38,16 @@ class _LoginPageState extends State<LoginPage> {
     required TextEditingController controller,
     required TextInputType keyboard,
     required bool obscure,
+    TextCapitalization capitalValue = TextCapitalization.none,
+    required int maxLength,
+    required int minLength,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboard,
       obscureText: obscure,
+      maxLength: maxLength,
+      minLines: minLength,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         labelText: label,
@@ -103,14 +108,21 @@ class _LoginPageState extends State<LoginPage> {
                           'Sign in to manage your matatu stage',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(height: 20),
-                        _textField(
-                          label: 'Email',
-                          controller: emailController,
-                          keyboard: TextInputType.emailAddress,
-                          obscure: false,
-                        ),
-                        const SizedBox(height: 10),
+                        if (widget.selectedRole.toLowerCase() ==
+                                'sacco_official' ||
+                            widget.selectedRole.toLowerCase() == 'matatu_owner')
+                          _textField(
+                            label: 'Email',
+                            controller: emailController,
+                            keyboard: TextInputType.emailAddress,
+                            obscure: false,
+                            minLength: 1,
+                            maxLength: 25,
+                          ),
+                        if (widget.selectedRole.toLowerCase() ==
+                                'sacco_official' ||
+                            widget.selectedRole.toLowerCase() == 'matatu_owner')
+                          const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() ==
                                 'sacco_official' ||
                             widget.selectedRole.toLowerCase() == 'matatu_owner')
@@ -119,15 +131,10 @@ class _LoginPageState extends State<LoginPage> {
                             controller: passwordController,
                             keyboard: TextInputType.visiblePassword,
                             obscure: true,
+                            minLength: 1,
+                            maxLength: 15,
                           ),
-                        const SizedBox(height: 18),
-                        if (widget.selectedRole.toLowerCase() == 'driver')
-                          _textField(
-                            label: 'Driver Name',
-                            controller: driverNameController,
-                            keyboard: TextInputType.name,
-                            obscure: false,
-                          ),
+
                         const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() == 'driver')
                           _textField(
@@ -135,24 +142,34 @@ class _LoginPageState extends State<LoginPage> {
                             controller: driverIdController,
                             keyboard: TextInputType.number,
                             obscure: false,
+                            minLength: 1,
+                            maxLength: 8,
                           ),
+                        const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() == 'driver')
                           _textField(
-                            label: 'Vehicle Number',
+                            label: 'Vehicle Number (Capital Letters)',
                             controller: vehicleNumberController,
                             keyboard: TextInputType.text,
                             obscure: false,
+                            capitalValue: TextCapitalization.characters,
+                            minLength: 1,
+                            maxLength: 8,
                           ),
                         const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() ==
                             'stage_marshal')
                           _textField(
-                            label: 'Stage Marshal Name ',
-                            controller: stageMarshalNameController,
-                            keyboard: TextInputType.name,
+                            label: 'Stage Marshal Email ',
+                            controller: stageMarshalEmailController,
+                            keyboard: TextInputType.emailAddress,
                             obscure: false,
+                            minLength: 1,
+                            maxLength: 25,
                           ),
-                        const SizedBox(height: 18),
+                        if (widget.selectedRole.toLowerCase() ==
+                            'stage_marshal')
+                          const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() ==
                             'stage_marshal')
                           _textField(
@@ -160,6 +177,8 @@ class _LoginPageState extends State<LoginPage> {
                             controller: stageMarshalIdController,
                             keyboard: TextInputType.number,
                             obscure: false,
+                            minLength: 1,
+                            maxLength: 8,
                           ),
                         const SizedBox(height: 18),
                         isLoading
@@ -195,7 +214,8 @@ class _LoginPageState extends State<LoginPage> {
                                       )!;
                                       final response = await Driver()
                                           .signInDriver(
-                                            email: emailController.text,
+                                            vehicleId:
+                                                vehicleNumberController.text,
                                             id: id,
                                           );
                                       if (response == true) {

@@ -28,28 +28,43 @@ class StageMarshal {
   Stream<List<Map<String, dynamic>>> fetchRawQueue() {
     return supabase
         .from('QUEUE')
-        .stream(primaryKey: ['queueId'])
+        .stream(primaryKey: ['vehicleId'])
+        .eq('approved', false)
         .order('queue_date', ascending: true)
         .map((rows) => rows);
+  }
+
+  //function
+  Stream<List<Map<String, dynamic>>> getDepartedLogs() {
+    return supabase
+        .from('QUEUE')
+        .stream(primaryKey: ['queueId'])
+        .eq('departed', true)
+        .order('queue_date', ascending: true);
   }
 
   Stream<List<Map<String, dynamic>>> fetchApprovedQueue() {
     return supabase
         .from('QUEUE')
         .stream(primaryKey: ['queueId'])
-        .eq('approved', true)
+        .eq('departed', false)
         .order('queue_date', ascending: true)
         .map((rows) => rows);
   }
 
   //approve driver in queue
-  Future approveDriver({required String vehicleNumber}) async {
-    print('Vehicle number : $vehicleNumber');
+  Future approveDriver({
+    required String vehicleNumber,
+    required int index,
+    required String time,
+  }) async {
     try {
       await supabase
           .from('QUEUE')
           .update({'approved': true})
-          .eq('vehicleId', vehicleNumber);
+          .eq('vehicleId', vehicleNumber)
+          .eq('queueId', index)
+          .eq('queue_date', time);
       Fluttertoast.showToast(msg: "Driver has been approved ");
     } on PostgrestException catch (fError) {
       Fluttertoast.showToast(msg: fError.message);
@@ -58,12 +73,17 @@ class StageMarshal {
     }
   }
 
-  Future departDriver({required String vehicleNumber}) async {
+  Future departDriver({
+    required String vehicleNumber,
+    required int index,
+    required String time,
+  }) async {
     try {
       await supabase
           .from('QUEUE')
           .update({'departed': true})
-          .eq('vehicleId', vehicleNumber);
+          .eq('vehicleId', vehicleNumber)
+          .eq('queue_date', time);
       Fluttertoast.showToast(msg: "Driver has been departed ");
     } on PostgrestException catch (fError) {
       Fluttertoast.showToast(msg: fError.message);

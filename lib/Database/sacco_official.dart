@@ -53,7 +53,6 @@ class SaccoOfficial {
         'name': name,
         'email': email,
       });
-      print('response code : ${response.toString()}');
       Fluttertoast.showToast(msg: 'Success');
     } on PostgrestException catch (dbError) {
       Fluttertoast.showToast(msg: dbError.message);

@@ -21,9 +21,11 @@ class _AssignVehicleScreenState extends State<AssignVehicleScreen> {
     required String label,
     required TextEditingController controller,
     required TextInputType keyboard,
+    TextCapitalization capitalValue = TextCapitalization.none,
   }) {
     return TextFormField(
       maxLength: length,
+      textCapitalization: capitalValue,
       controller: controller,
       keyboardType: keyboard,
       decoration: InputDecoration(
@@ -63,6 +65,7 @@ class _AssignVehicleScreenState extends State<AssignVehicleScreen> {
                 length: 8,
                 label: 'Vehicle Number',
                 controller: vehicleNumberController,
+                capitalValue: TextCapitalization.characters,
                 keyboard: TextInputType.text,
               ),
               const SizedBox(height: 16),

@@ -6,8 +6,8 @@ Widget buildDashboard(
   BuildContext context,
 ) {
   return Scaffold(
-    backgroundColor: Colors.brown[300],
-    appBar: AppBar(title: Text(title), backgroundColor: Colors.amberAccent),
+    backgroundColor: Colors.white70,
+    appBar: AppBar(title: Text(title), backgroundColor: const Color.fromARGB(255, 88, 127, 146)),
     body: ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, i) {

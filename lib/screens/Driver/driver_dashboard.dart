@@ -3,7 +3,6 @@ import 'package:queuetrack/Database/driver.dart';
 import 'package:queuetrack/screens/Driver/maps_view.dart';
 import '../dashboard_helper.dart';
 import '../view_queue_status.dart';
-import 'driver_profile_screen.dart';
 
 class DriverDashboard extends StatelessWidget {
   DriverDashboard({super.key});
@@ -60,17 +59,7 @@ class DriverDashboard extends StatelessWidget {
       'color': Colors.orange,
       'onTap': (ctx) => (ctx),
     },
-    {
-      'title': 'Profile',
-      'icon': Icons.person,
-      'color': Colors.purple,
-      'onTap': (ctx) {
-        Navigator.push(
-          ctx,
-          MaterialPageRoute(builder: (_) => const DriverProfileScreen()),
-        );
-      },
-    },
+
     {
       'title': 'Maps View',
       'icon': Icons.map_outlined,

@@ -83,11 +83,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 TextField(
                   controller: nameController,
+                  maxLength: 20,
                   decoration: const InputDecoration(labelText: 'Full name'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: idNumberController,
+                  maxLength: 8,
                   decoration: const InputDecoration(
                     labelText: 'Your Id Number',
                   ),
@@ -95,6 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: emailController,
+                  maxLength: 25,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
@@ -102,12 +105,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 TextField(
                   controller: passwordController,
                   obscureText: true,
+                  maxLength: 15,
                   decoration: const InputDecoration(labelText: 'Password'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: confirmController,
                   obscureText: true,
+                  maxLength: 15,
                   decoration: const InputDecoration(
                     labelText: 'Confirm Password',
                   ),

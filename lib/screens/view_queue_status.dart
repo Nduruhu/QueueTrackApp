@@ -23,6 +23,7 @@ class ViewQueueStatus extends StatelessWidget {
           if (drivers.isEmpty) {
             return Center(child: Text('No Approved Vehicles'));
           }
+          print('Drivers: $drivers');
           return ListView.builder(
             itemCount: drivers.length,
             itemBuilder: (context, index) {
@@ -32,7 +33,7 @@ class ViewQueueStatus extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: Text(
-                        index.toString(),
+                        driver['queueId'].toString(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,

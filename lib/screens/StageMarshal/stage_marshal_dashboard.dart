@@ -16,7 +16,10 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
     BottomNavigationBarItem(icon: Icon(Icons.view_agenda), label: 'Raw Queue'),
     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Approved Queue'),
   ];
-  late List<Widget> pages = [buildRawQueue(context), ViewQueueStatus()];
+  late List<Widget> pages = [
+    buildRawQueue(context),
+    buildApprovedQueue(context),
+  ];
 
   Widget buildRawQueue(BuildContext context) {
     return StreamBuilder(
@@ -47,8 +50,12 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
                           ),
                         ),
                         ListTile(
-                          title: Text('Departed : ${doc['departed']}'),
-                          subtitle: Text('Approved : ${doc['approved']}'),
+                          title: Text(
+                            'Departed : ${doc['departed'].toString()}',
+                          ),
+                          subtitle: Text(
+                            'Approved : ${doc['approved'].toString()}',
+                          ),
                         ),
 
                         Row(
@@ -58,8 +65,13 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
                                   ? () async {
                                       try {
                                         await StageMarshal().approveDriver(
+                                          index: int.tryParse(
+                                            doc['queueId'].toString(),
+                                          )!,
                                           vehicleNumber: doc['vehicleId'],
+                                          time: doc['queue_date'].toString(),
                                         );
+                                        setState(() {});
                                       } catch (err) {
                                         Fluttertoast.showToast(
                                           msg: err.toString(),
@@ -69,21 +81,62 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
                                   : null,
                               child: Text('Approve'),
                             ),
-                            TextButton(
-                              onPressed: doc['approved'] == true
-                                  ? () async {
-                                      await StageMarshal().departDriver(
-                                        vehicleNumber: doc['vehicleId'],
-                                      );
-                                    }
-                                  : null,
-                              child: Text('Depart'),
-                            ),
                           ],
                         ),
                       ],
                     ),
                   );
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildApprovedQueue(BuildContext context) {
+    return StreamBuilder(
+      stream: StageMarshal().fetchApprovedQueue(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData &&
+            snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: ListTile(
+              leading: CircularProgressIndicator(),
+              title: Text('Loading...'),
+            ),
+          );
+        }
+        if (snapshot.data!.isEmpty) {
+          return Center(child: Text('No data for queue'));
+        }
+        final data = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            final row = data[index];
+            return (row['approved'] == true)
+                ? ListTile(
+                    leading: Text(row['queueId'].toString()),
+                    title: Text(row['vehicleId']),
+                    subtitle: Text('Departed :${row['departed'].toString()}'),
+                    trailing: TextButton(
+                      onPressed: (row['departed'] == false)
+                          ? () {
+                              StageMarshal().departDriver(
+                                vehicleNumber: row['vehicleId'],
+                                index: row['queueId'],
+                                time: row['queue_date'].toString(),
+                              );
+                              setState(() {});
+                            }
+                          : null,
+                      child: Text('Depart'),
+                    ),
+                  )
+                : null;
           },
         );
       },
