@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:queuetrack/Database/stage_marshal.dart';
-import 'package:queuetrack/screens/view_queue_status.dart';
 
 class StageMarshalDashboard extends StatefulWidget {
   const StageMarshalDashboard({super.key});
