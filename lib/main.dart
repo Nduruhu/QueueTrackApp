@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,7 +24,19 @@ void main() async {
     OneSignal.initialize('fb4a4b27-a6d7-44d4-ab55-d418d082ba74');
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
     await OneSignal.Notifications.requestPermission(true);
-
+    final LocationPermission hasPermission =
+    await Geolocator.checkPermission();
+    if (hasPermission == LocationPermission.denied ||
+        hasPermission == LocationPermission.deniedForever) {
+      final permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Fluttertoast.showToast(msg: 'Cant Proceed without permission');
+        final res=await Geolocator.requestPermission();
+        if(res ==LocationPermission.denied){
+          return;
+        }
+      }
+    }
     runApp(
       MultiProvider(
         providers: [ChangeNotifierProvider(create: (_) => Driver())],
@@ -31,7 +44,6 @@ void main() async {
       ),
     );
   } catch (err) {
-    print("error loading app : ${err.toString()}");
     Fluttertoast.showToast(msg: 'Error : ${err.toString()}');
   }
 }

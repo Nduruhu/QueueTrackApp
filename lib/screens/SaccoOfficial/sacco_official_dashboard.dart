@@ -39,7 +39,6 @@ class SaccoOfficialDashboard extends StatelessWidget {
               if (docs.isEmpty) {
                 return Center(child: Text('No queue data'));
               }
-              print('docs is :$docs');
               return ListView.builder(
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
@@ -75,40 +74,20 @@ class SaccoOfficialDashboard extends StatelessWidget {
 
   // -------------------- DASHBOARD --------------------
   @override
-  Widget build(BuildContext context) =>
-      buildDashboard('Sacco Official Dashboard', [
-        {
-          'title': 'View Active Queue',
-          'icon': Icons.queue,
-          'color': Colors.teal,
-          'onTap': (ctx) => _viewActiveQueue(ctx),
-        },
-        {
-          'title': 'View Departed Logs',
-          'icon': Icons.history,
-          'color': Colors.blue,
-          'onTap': (ctx) => Navigator.push(
-            ctx,
-            MaterialPageRoute(builder: (ctx) => ViewDepartedLogs()),
-          ),
-        },
-        {
-          'title': 'Download / Email PDF Report',
-          'icon': Icons.picture_as_pdf,
-          'color': Colors.redAccent,
-          'onTap': (ctx) => GetPdfData().createPdfDocument(
-            pdfName: 'QueueTrackReport',
-            context: ctx,
-          ),
-        },
-        {
-          'title': 'Register Stage Marshal',
-          'icon': Icons.directions_car,
-          'color': Colors.purple,
-          'onTap': (ctx) => Navigator.push(
-            ctx,
-            MaterialPageRoute(builder: (_) => RegisterStageMarshal()),
-          ),
-        },
-      ], context);
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        backgroundColor: Colors.blue[900],
+        centerTitle: true,
+        title: Text('Sacco Dashboard'),
+      ),
+      body: Column(
+        children: [
+          Card()
+        ],
+      )
+    );
+  }
+      
 }

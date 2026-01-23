@@ -41,14 +41,17 @@ class _LoginPageState extends State<LoginPage> {
     TextCapitalization capitalValue = TextCapitalization.none,
     required int maxLength,
     required int minLength,
+    required Icon leadingIcon,
   }) {
     return TextFormField(
+      
       controller: controller,
       keyboardType: keyboard,
       obscureText: obscure,
       maxLength: maxLength,
       minLines: minLength,
       decoration: InputDecoration(
+        icon: leadingIcon,
         border: OutlineInputBorder(),
         labelText: label,
       ),
@@ -75,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF0EA5A4), Color(0xFF009688)],
+            colors: [Colors.blue,Colors.blue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -99,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                           'QueueTrack',
                           style: Theme.of(context).textTheme.headlineSmall
                               ?.copyWith(
-                                color: Colors.teal.shade900,
+                                color: Colors.blue,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
@@ -112,6 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                                 'sacco_official' ||
                             widget.selectedRole.toLowerCase() == 'matatu_owner')
                           _textField(
+                            leadingIcon: Icon(Icons.email),
                             label: 'Email',
                             controller: emailController,
                             keyboard: TextInputType.emailAddress,
@@ -127,6 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                                 'sacco_official' ||
                             widget.selectedRole.toLowerCase() == 'matatu_owner')
                           _textField(
+                            leadingIcon: Icon(Icons.lock),
                             label: 'Password',
                             controller: passwordController,
                             keyboard: TextInputType.visiblePassword,
@@ -138,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() == 'driver')
                           _textField(
+                            leadingIcon: Icon(Icons.badge),
                             label: 'Driver Id',
                             controller: driverIdController,
                             keyboard: TextInputType.number,
@@ -148,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 18),
                         if (widget.selectedRole.toLowerCase() == 'driver')
                           _textField(
+                            leadingIcon: Icon(Icons.confirmation_num),
                             label: 'Vehicle Number (Capital Letters)',
                             controller: vehicleNumberController,
                             keyboard: TextInputType.text,
@@ -160,6 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                         if (widget.selectedRole.toLowerCase() ==
                             'stage_marshal')
                           _textField(
+                            leadingIcon: Icon(Icons.email),
                             label: 'Stage Marshal Email ',
                             controller: stageMarshalEmailController,
                             keyboard: TextInputType.emailAddress,
@@ -173,6 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                         if (widget.selectedRole.toLowerCase() ==
                             'stage_marshal')
                           _textField(
+                            leadingIcon: Icon(Icons.badge),
                             label: 'Stage Marshal Id',
                             controller: stageMarshalIdController,
                             keyboard: TextInputType.number,
@@ -184,6 +193,11 @@ class _LoginPageState extends State<LoginPage> {
                         isLoading
                             ? const CircularProgressIndicator()
                             : ElevatedButton(
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStatePropertyAll(Colors.white),
+                            backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                            
+                          ),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     isLoading = !isLoading;

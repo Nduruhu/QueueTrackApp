@@ -73,7 +73,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Account')),
+      backgroundColor: Color(0xFFBBDEFB),
+      appBar: AppBar(title: const Text(
+        style: TextStyle(),
+          'Create Account')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Card(
@@ -84,13 +87,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 TextField(
                   controller: nameController,
                   maxLength: 20,
-                  decoration: const InputDecoration(labelText: 'Full name'),
+                  decoration: const InputDecoration(icon: Icon(Icons.person),labelText: 'Full name'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  style: TextStyle(
+                    fontWeight: FontWeight.w100
+                  ),
                   controller: idNumberController,
                   maxLength: 8,
                   decoration: const InputDecoration(
+                    icon: Icon(Icons.badge),
                     labelText: 'Your Id Number',
                   ),
                 ),
@@ -99,14 +106,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: emailController,
                   maxLength: 25,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  decoration: const InputDecoration(icon: Icon(Icons.email),labelText: 'Email'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: passwordController,
                   obscureText: true,
                   maxLength: 15,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(icon: Icon(Icons.lock),labelText: 'Password'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -114,6 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: true,
                   maxLength: 15,
                   decoration: const InputDecoration(
+                    icon: Icon(Icons.lock),
                     labelText: 'Confirm Password',
                   ),
                 ),
@@ -130,10 +138,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 isLoading
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
+                  style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.blue)),
                         onPressed: () async {
                           await _signUp(category: widget.selectedRole);
                         },
-                        child: const Text('Create account'),
+                        child: const Text(
+                          style: TextStyle(color: Colors.white),
+                            'Create account'),
                       ),
               ],
             ),

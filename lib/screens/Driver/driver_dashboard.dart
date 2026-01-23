@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:queuetrack/Database/driver.dart';
 import 'package:queuetrack/screens/Driver/maps_view.dart';
 import '../dashboard_helper.dart';
@@ -6,6 +8,8 @@ import '../view_queue_status.dart';
 
 class DriverDashboard extends StatelessWidget {
   DriverDashboard({super.key});
+
+  late final double latt,long;
   final TextEditingController vehicleNumberController = TextEditingController();
 
   Future _checkInUi(BuildContext context) {
@@ -33,6 +37,34 @@ class DriverDashboard extends StatelessWidget {
       },
     );
   }
+
+
+  Future openGoogleMaps() async {
+    try {
+      final LocationPermission hasPermission =
+      await Geolocator.checkPermission();
+      if (hasPermission == LocationPermission.denied ||
+          hasPermission == LocationPermission.deniedForever) {
+        final permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Fluttertoast.showToast(msg: 'Cant Proceed without permission');
+          return null;
+        }
+        return null;
+      }
+      //position
+      final Position position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
+      );
+      latt = position.latitude;
+      long = position.longitude;
+      return [latt,long];
+    } catch (err) {
+      Fluttertoast.showToast(msg: err.toString());
+      return null;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) => buildDashboard('Driver Dashboard', [
@@ -64,8 +96,14 @@ class DriverDashboard extends StatelessWidget {
       'title': 'Maps View',
       'icon': Icons.map_outlined,
       'color': Colors.lightBlue,
-      'onTap': (ctx) {
-        MapsViewState().openGoogleMaps();
+      'onTap': (ctx)async {
+        final List coordinates=await openGoogleMaps();
+        if(coordinates.isEmpty){
+          Fluttertoast.showToast(msg: 'Could not fetch location.Enable permissions');
+          return;
+        }else{
+        Navigator.push(ctx,MaterialPageRoute(builder: (ctx)=>MapsView(lat:coordinates[0] ,lng: coordinates[1], )));
+        }
       },
     },
   ], context);

@@ -15,9 +15,20 @@ class _RoleSelectionState extends State<RoleSelection> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.blue,
-        title: Text('What is your role?'),
+        title: ListTile(
+          titleAlignment: ListTileTitleAlignment.center,
+
+          title: Text(
+            'Karibu Queue Track',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 25
+          ),
+          ),
+          subtitle: Text('Digital Queueing',style: TextStyle(color: Colors.black),),
+        ),
       ),
-      backgroundColor: Colors.lightBlue[300],
+      backgroundColor: Colors.blue,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(50.0),
@@ -25,42 +36,51 @@ class _RoleSelectionState extends State<RoleSelection> {
             mainAxisSize: MainAxisSize.min,
 
             children: [
-              ListTile(
-                leading: Icon(Icons.badge),
-                title: Text('Sacco Official'),
-                onTap: (){
-                  //aende login page as sacco official
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'sacco_official',)));
-                }
+              Card(
+                elevation: 5,
+                child: ListTile(
+                    leading: Icon(Icons.badge,size: 40,),
+                    title: Text('Sacco Official'),
+                    onTap: (){
+                      //aende login page as sacco official
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => LoginPage(selectedRole: 'sacco_official',)));
+                    }
+                ),
               ),
               Divider(),
-              ListTile(
-                leading: Icon(Icons.person),
+              Card(elevation: 5,child: ListTile(
+                leading: Icon(Icons.person,size: 40,),
                 title: Text('Stage Marshal'),
                 onTap: (){
                   //aende login page as stage marshal
                   Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'stage_marshal',)));
                 },
+              )
               ),
               Divider(),
-              ListTile(
-                leading: Icon(Icons.handshake),
+              Card(elevation: 5,
+              child: ListTile(
+                leading: Icon(Icons.handshake,size: 40,),
                 title: Text('Matatu Owner'),
                 onTap: (){
                   //aende login page as matatu owner
                   Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'matatu_owner',)));
                 },
-              ),
+              ),),
               Divider(),
-              ListTile(
-                leading: Icon(Icons.directions_car),
-                title: Text('Driver'),
-                onTap: (){
-                  //aende login page as driver
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'driver',)));
+              Card(
+                elevation: 5,
+                child: ListTile(
+                  leading: Icon(Icons.directions_car,size: 40,),
+                  title: Text('Driver'),
+                  onTap: (){
+                    //aende login page as driver
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'driver',)));
 
-                },
-              ),
+                  },
+                ),
+              )
             ],
           ),
         ),
