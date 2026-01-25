@@ -42,9 +42,9 @@ class _LoginPageState extends State<LoginPage> {
     required int maxLength,
     required int minLength,
     required Icon leadingIcon,
+
   }) {
     return TextFormField(
-      
       controller: controller,
       keyboardType: keyboard,
       obscureText: obscure,

@@ -95,6 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     fontWeight: FontWeight.w100
                   ),
                   controller: idNumberController,
+                  autofillHints: [AutofillHints.telephoneNumber],
                   maxLength: 8,
                   decoration: const InputDecoration(
                     icon: Icon(Icons.badge),
@@ -104,6 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: emailController,
+                  autofillHints: [AutofillHints.email],
                   maxLength: 25,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(icon: Icon(Icons.email),labelText: 'Email'),
@@ -111,6 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: passwordController,
+                  autofillHints: [AutofillHints.password],
                   obscureText: true,
                   maxLength: 15,
                   decoration: const InputDecoration(icon: Icon(Icons.lock),labelText: 'Password'),
@@ -118,6 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: confirmController,
+                  autofillHints: [AutofillHints.password],
                   obscureText: true,
                   maxLength: 15,
                   decoration: const InputDecoration(
