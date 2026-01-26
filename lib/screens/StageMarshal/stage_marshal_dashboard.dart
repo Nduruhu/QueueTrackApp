@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:queuetrack/AI/queue_analysis.dart';
 import 'package:queuetrack/Database/stage_marshal.dart';
 
 class StageMarshalDashboard extends StatefulWidget {
@@ -14,10 +15,14 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
   final List<BottomNavigationBarItem> navigationButtons = [
     BottomNavigationBarItem(icon: Icon(Icons.view_agenda), label: 'Raw Queue'),
     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Approved Queue'),
+    BottomNavigationBarItem(icon: Icon(Icons.data_exploration),label: 'Queue Analysis'),
+    BottomNavigationBarItem(icon: Icon(Icons.logout),label: 'Log Out')
   ];
   late List<Widget> pages = [
     buildRawQueue(context),
     buildApprovedQueue(context),
+    QueueAnalysis(),
+    signOut(context)
   ];
 
   Widget buildRawQueue(BuildContext context) {
@@ -70,7 +75,9 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
                                           vehicleNumber: doc['vehicleId'],
                                           time: doc['queue_date'].toString(),
                                         );
-                                        setState(() {});
+                                        setState(() {
+                                          docs.removeAt(index);
+                                        });
                                       } catch (err) {
                                         Fluttertoast.showToast(
                                           msg: err.toString(),
@@ -129,7 +136,9 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
                                 index: row['queueId'],
                                 time: row['queue_date'].toString(),
                               );
-                              setState(() {});
+                              setState(() {
+                                data.removeAt(index);
+                              });
                             }
                           : null,
                       child: Text('Depart'),
@@ -142,6 +151,12 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
     );
   }
 
+
+  Widget signOut(BuildContext context){
+    return Center(child:ElevatedButton(onPressed: (){
+      Navigator.popUntil(context, ModalRoute.withName('/roleselection'));
+    }, child: Text('Log Out')));
+  }
   @override
   void initState() {
     super.initState();
@@ -157,6 +172,10 @@ class _StageMarshalDashboardState extends State<StageMarshalDashboard> {
         bottomNavigationBar: BottomNavigationBar(
           items: navigationButtons,
           currentIndex: currentIndex,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.orange,
           onTap: (index) {
             setState(() {
               currentIndex = index;

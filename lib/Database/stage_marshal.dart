@@ -61,7 +61,10 @@ class StageMarshal {
     try {
       await supabase
           .from('QUEUE')
-          .update({'approved': true})
+          .update({
+        'approved': true,
+        'approved_date':DateTime.now().toString()
+      })
           .eq('vehicleId', vehicleNumber)
           .eq('queueId', index)
           .eq('queue_date', time);
@@ -81,7 +84,7 @@ class StageMarshal {
     try {
       await supabase
           .from('QUEUE')
-          .update({'departed': true})
+          .update({'departed': true,'departed_date':DateTime.now().toString()})
           .eq('vehicleId', vehicleNumber)
           .eq('queue_date', time);
       Fluttertoast.showToast(msg: "Driver has been departed ");

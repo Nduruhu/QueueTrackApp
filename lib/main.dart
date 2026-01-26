@@ -22,7 +22,6 @@ void main() async {
       url: 'https://bnnvcvreknixlofepafz.supabase.co',
     );
     OneSignal.initialize('fb4a4b27-a6d7-44d4-ab55-d418d082ba74');
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
     await OneSignal.Notifications.requestPermission(true);
     final LocationPermission hasPermission =
     await Geolocator.checkPermission();
@@ -60,7 +59,7 @@ class QueueTrackApp extends StatelessWidget {
       initialRoute: '/roleselection', // ✅ Start with login page
       routes: {
         '/roleselection': (_) => const RoleSelection(),
-        // dashboards we’ll navigate to manually
+        // dashboards we’ll navigate  manually
       },
     );
   }

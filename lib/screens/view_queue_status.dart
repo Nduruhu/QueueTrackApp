@@ -23,12 +23,11 @@ class ViewQueueStatus extends StatelessWidget {
           if (drivers.isEmpty) {
             return Center(child: Text('No Approved Vehicles'));
           }
-          print('Drivers: $drivers');
           return ListView.builder(
             itemCount: drivers.length,
             itemBuilder: (context, index) {
               final driver = drivers[index];
-              return Card(
+              return (driver['approved']==false)?null:Card(
                 child: Column(
                   children: [
                     ListTile(

@@ -82,75 +82,78 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(18.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: nameController,
-                  maxLength: 20,
-                  decoration: const InputDecoration(icon: Icon(Icons.person),labelText: 'Full name'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  style: TextStyle(
-                    fontWeight: FontWeight.w100
+            child: AutofillGroup(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: nameController,
+                    maxLength: 20,
+                    decoration: const InputDecoration(icon: Icon(Icons.person),labelText: 'Full name'),
                   ),
-                  controller: idNumberController,
-                  autofillHints: [AutofillHints.telephoneNumber],
-                  maxLength: 8,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.badge),
-                    labelText: 'Your Id Number',
+                  const SizedBox(height: 12),
+                  TextField(
+                    style: TextStyle(
+                      fontWeight: FontWeight.w100
+                    ),
+                    controller: idNumberController,
+                    autofillHints: [AutofillHints.telephoneNumber],
+                    maxLength: 8,
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.badge),
+                      labelText: 'Your Id Number',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: emailController,
-                  autofillHints: [AutofillHints.email],
-                  maxLength: 25,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(icon: Icon(Icons.email),labelText: 'Email'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: passwordController,
-                  autofillHints: [AutofillHints.password],
-                  obscureText: true,
-                  maxLength: 15,
-                  decoration: const InputDecoration(icon: Icon(Icons.lock),labelText: 'Password'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: confirmController,
-                  autofillHints: [AutofillHints.password],
-                  obscureText: true,
-                  maxLength: 15,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.lock),
-                    labelText: 'Confirm Password',
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: emailController,
+                    autofillHints: [AutofillHints.email],
+                    maxLength: 25,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(icon: Icon(Icons.email),labelText: 'Email'),
                   ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: selectedRole,
-                  items: roles
-                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                      .toList(),
-                  onChanged: (v) => setState(() => selectedRole = v),
-                  decoration: const InputDecoration(labelText: 'Select Role'),
-                ),
-                const SizedBox(height: 18),
-                isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                  style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.blue)),
-                        onPressed: () async {
-                          await _signUp(category: widget.selectedRole);
-                        },
-                        child: const Text(
-                          style: TextStyle(color: Colors.white),
-                            'Create account'),
-                      ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passwordController,
+                    autofillHints: [AutofillHints.password],
+                    obscureText: true,
+                    maxLength: 15,
+                    decoration: const InputDecoration(icon: Icon(Icons.lock),labelText: 'Password'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: confirmController,
+                    autofillHints: [AutofillHints.password],
+                    obscureText: true,
+                    maxLength: 15,
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.lock),
+                      labelText: 'Confirm Password',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedRole,
+                    items: roles
+                        .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                        .toList(),
+                    onChanged: (v) => setState(() => selectedRole = v),
+                    decoration: const InputDecoration(labelText: 'Select Role'),
+                  ),
+                  const SizedBox(height: 18),
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : ElevatedButton(
+                    style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.blue)),
+                          onPressed: () async {
+                            await _signUp(category: widget.selectedRole);
+                            
+                          },
+                          child: const Text(
+                            style: TextStyle(color: Colors.white),
+                              'Create account'),
+                        ),
+                ],
+              ),
             ),
           ),
         ),

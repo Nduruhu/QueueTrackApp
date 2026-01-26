@@ -56,14 +56,14 @@ class GetPdfData {
                     pw.Padding(
                       padding: const pw.EdgeInsets.all(4),
                       child: pw.Text(
-                        'Number of Trips',
+                        'Approval Time',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                       ),
                     ),
                     pw.Padding(
                       padding: const pw.EdgeInsets.all(4),
                       child: pw.Text(
-                        'Wait Time',
+                        'Departed Time',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                       ),
                     ),
@@ -84,11 +84,11 @@ class GetPdfData {
                       ),
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(4),
-                        child: pw.Text(data[i]['numberOfTrips'].toString()),
+                        child: pw.Text(data[i]['approved_date'].toString().split('+')[0]),
                       ),
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(4),
-                        child: pw.Text(data[i]['waitTime'].toString()),
+                        child: pw.Text(data[i]['departed_date'].toString().split('+')[0]),
                       ),
                     ],
                   ),
@@ -99,21 +99,22 @@ class GetPdfData {
       );
 
       // 4. Show system preview / save / share dialog
-      await Printing.layoutPdf(
+      if(await Printing.layoutPdf(
         name:
             '${pdfName.toString()}-${DateTime.now().toString().split(' ')[0]}',
         onLayout: (PdfPageFormat format) async => pf.save(),
-      );
-      final pdfBytes = await pf.save();
-      await Printing.sharePdf(
-        filename: pdfName,
-        bytes: pdfBytes,
-        subject: 'Queue Track Daily Report',
-        body: "Attached is today's report.",
-      );
+      )){
+        await Printing.sharePdf(
+          filename: pdfName,
+          bytes: await pf.save(),
+          subject: 'Queue Track Daily Report',
+          body: "Attached is today's report.",
+        );
+      }else{
+        return;
+      }
     } catch (err) {
       Fluttertoast.showToast(msg: err.toString());
-      print('PDF Error: $err');
     }
   }
 }

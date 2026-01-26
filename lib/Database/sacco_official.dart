@@ -48,7 +48,7 @@ class SaccoOfficial {
     required int nationalId,
   }) async {
     try {
-      final response = await supabase.from('STAGE-MARSHAL').insert({
+       await supabase.from('STAGE-MARSHAL').insert({
         'nationalId': nationalId,
         'name': name,
         'email': email,

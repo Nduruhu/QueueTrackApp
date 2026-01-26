@@ -95,228 +95,230 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Form(
                     key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'QueueTrack',
-                          style: Theme.of(context).textTheme.headlineSmall
-                              ?.copyWith(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Sign in to manage your matatu stage',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        if (widget.selectedRole.toLowerCase() ==
-                                'sacco_official' ||
-                            widget.selectedRole.toLowerCase() == 'matatu_owner')
-                          _textField(
-                            leadingIcon: Icon(Icons.email),
-                            label: 'Email',
-                            controller: emailController,
-                            keyboard: TextInputType.emailAddress,
-                            obscure: false,
-                            minLength: 1,
-                            maxLength: 25,
+                    child: AutofillGroup(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'QueueTrack',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                        if (widget.selectedRole.toLowerCase() ==
-                                'sacco_official' ||
-                            widget.selectedRole.toLowerCase() == 'matatu_owner')
+                          const SizedBox(height: 10),
+                          Text(
+                            'Sign in to manage your matatu stage',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          if (widget.selectedRole.toLowerCase() ==
+                                  'sacco_official' ||
+                              widget.selectedRole.toLowerCase() == 'matatu_owner')
+                            _textField(
+                              leadingIcon: Icon(Icons.email),
+                              label: 'Email',
+                              controller: emailController,
+                              keyboard: TextInputType.emailAddress,
+                              obscure: false,
+                              minLength: 1,
+                              maxLength: 25,
+                            ),
+                          if (widget.selectedRole.toLowerCase() ==
+                                  'sacco_official' ||
+                              widget.selectedRole.toLowerCase() == 'matatu_owner')
+                            const SizedBox(height: 18),
+                          if (widget.selectedRole.toLowerCase() ==
+                                  'sacco_official' ||
+                              widget.selectedRole.toLowerCase() == 'matatu_owner')
+                            _textField(
+                              leadingIcon: Icon(Icons.lock),
+                              label: 'Password',
+                              controller: passwordController,
+                              keyboard: TextInputType.visiblePassword,
+                              obscure: true,
+                              minLength: 1,
+                              maxLength: 15,
+                            ),
+                      
                           const SizedBox(height: 18),
-                        if (widget.selectedRole.toLowerCase() ==
-                                'sacco_official' ||
-                            widget.selectedRole.toLowerCase() == 'matatu_owner')
-                          _textField(
-                            leadingIcon: Icon(Icons.lock),
-                            label: 'Password',
-                            controller: passwordController,
-                            keyboard: TextInputType.visiblePassword,
-                            obscure: true,
-                            minLength: 1,
-                            maxLength: 15,
-                          ),
-
-                        const SizedBox(height: 18),
-                        if (widget.selectedRole.toLowerCase() == 'driver')
-                          _textField(
-                            leadingIcon: Icon(Icons.badge),
-                            label: 'Driver Id',
-                            controller: driverIdController,
-                            keyboard: TextInputType.number,
-                            obscure: false,
-                            minLength: 1,
-                            maxLength: 8,
-                          ),
-                        const SizedBox(height: 18),
-                        if (widget.selectedRole.toLowerCase() == 'driver')
-                          _textField(
-                            leadingIcon: Icon(Icons.confirmation_num),
-                            label: 'Vehicle Number (Capital Letters)',
-                            controller: vehicleNumberController,
-                            keyboard: TextInputType.text,
-                            obscure: false,
-                            capitalValue: TextCapitalization.characters,
-                            minLength: 1,
-                            maxLength: 8,
-                          ),
-                        const SizedBox(height: 18),
-                        if (widget.selectedRole.toLowerCase() ==
-                            'stage_marshal')
-                          _textField(
-                            leadingIcon: Icon(Icons.email),
-                            label: 'Stage Marshal Email ',
-                            controller: stageMarshalEmailController,
-                            keyboard: TextInputType.emailAddress,
-                            obscure: false,
-                            minLength: 1,
-                            maxLength: 25,
-                          ),
-                        if (widget.selectedRole.toLowerCase() ==
-                            'stage_marshal')
+                          if (widget.selectedRole.toLowerCase() == 'driver')
+                            _textField(
+                              leadingIcon: Icon(Icons.badge),
+                              label: 'Driver Id',
+                              controller: driverIdController,
+                              keyboard: TextInputType.number,
+                              obscure: false,
+                              minLength: 1,
+                              maxLength: 8,
+                            ),
                           const SizedBox(height: 18),
-                        if (widget.selectedRole.toLowerCase() ==
-                            'stage_marshal')
-                          _textField(
-                            leadingIcon: Icon(Icons.badge),
-                            label: 'Stage Marshal Id',
-                            controller: stageMarshalIdController,
-                            keyboard: TextInputType.number,
-                            obscure: false,
-                            minLength: 1,
-                            maxLength: 8,
-                          ),
-                        const SizedBox(height: 18),
-                        isLoading
-                            ? const CircularProgressIndicator()
-                            : ElevatedButton(
-                          style: ButtonStyle(
-                            foregroundColor: WidgetStatePropertyAll(Colors.white),
-                            backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                            
-                          ),
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    isLoading = !isLoading;
-                                    if (widget.selectedRole
-                                            .toLowerCase() == //sign in ya matatu owner
-                                        'matatu_owner') {
-                                      final response = await MatatuOwner()
-                                          .signIn(
-                                            email: emailController.text,
-                                            password: passwordController.text,
-                                          );
-                                      if (response == true) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                MatatuOwnerDashboard(),
-                                          ),
-                                        );
-                                      }
+                          if (widget.selectedRole.toLowerCase() == 'driver')
+                            _textField(
+                              leadingIcon: Icon(Icons.confirmation_num),
+                              label: 'Vehicle Number (Capital Letters)',
+                              controller: vehicleNumberController,
+                              keyboard: TextInputType.text,
+                              obscure: false,
+                              capitalValue: TextCapitalization.characters,
+                              minLength: 1,
+                              maxLength: 8,
+                            ),
+                          const SizedBox(height: 18),
+                          if (widget.selectedRole.toLowerCase() ==
+                              'stage_marshal')
+                            _textField(
+                              leadingIcon: Icon(Icons.email),
+                              label: 'Stage Marshal Email ',
+                              controller: stageMarshalEmailController,
+                              keyboard: TextInputType.emailAddress,
+                              obscure: false,
+                              minLength: 1,
+                              maxLength: 25,
+                            ),
+                          if (widget.selectedRole.toLowerCase() ==
+                              'stage_marshal')
+                            const SizedBox(height: 18),
+                          if (widget.selectedRole.toLowerCase() ==
+                              'stage_marshal')
+                            _textField(
+                              leadingIcon: Icon(Icons.badge),
+                              label: 'Stage Marshal Id',
+                              controller: stageMarshalIdController,
+                              keyboard: TextInputType.number,
+                              obscure: false,
+                              minLength: 1,
+                              maxLength: 8,
+                            ),
+                          const SizedBox(height: 18),
+                          isLoading
+                              ? const CircularProgressIndicator()
+                              : ElevatedButton(
+                            style: ButtonStyle(
+                              foregroundColor: WidgetStatePropertyAll(Colors.white),
+                              backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                              
+                            ),
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
                                       isLoading = !isLoading;
-                                    } else if (widget
-                                            .selectedRole //sign in ya driver
-                                            .toLowerCase() ==
-                                        'driver') {
-                                      int id = int.tryParse(
-                                        driverIdController.text.toString(),
-                                      )!;
-                                      final response = await Driver()
-                                          .signInDriver(
-                                            vehicleId:
-                                                vehicleNumberController.text,
-                                            id: id,
+                                      if (widget.selectedRole
+                                              .toLowerCase() == //sign in ya matatu owner
+                                          'matatu_owner') {
+                                        final response = await MatatuOwner()
+                                            .signIn(
+                                              email: emailController.text,
+                                              password: passwordController.text,
+                                            );
+                                        if (response == true) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MatatuOwnerDashboard(),
+                                            ),
                                           );
-                                      if (response == true) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                DriverDashboard(),
-                                          ),
-                                        );
-                                      }
-
-                                      isLoading = !isLoading;
-                                    } else if (widget
-                                            .selectedRole //sign in a sacco official
-                                            .toLowerCase()
-                                            .toString() ==
-                                        'sacco_official') {
-                                      final response = await SaccoOfficial()
-                                          .signIn(
-                                            email: emailController.text,
-                                            password: passwordController.text,
-                                          );
-                                      if (response == true) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                SaccoOfficialDashboard(),
-                                          ),
-                                        );
+                                        }
                                         isLoading = !isLoading;
-                                      } else {
-                                        return;
-                                      }
-                                      isLoading = !isLoading;
-                                    } else if (widget.selectedRole
-                                            .toLowerCase()
-                                            .toString() ==
-                                        'stage_marshal') {
-                                      //sign in stage marshal
-                                      final response = await StageMarshal()
-                                          .signIn(
-                                            email: emailController.text,
-                                            id: int.tryParse(
-                                              stageMarshalIdController.text,
-                                            )!,
+                                      } else if (widget
+                                              .selectedRole //sign in ya driver
+                                              .toLowerCase() ==
+                                          'driver') {
+                                        int id = int.tryParse(
+                                          driverIdController.text.toString(),
+                                        )!;
+                                        final response = await Driver()
+                                            .signInDriver(
+                                              vehicleId:
+                                                  vehicleNumberController.text,
+                                              id: id,
+                                            );
+                                        if (response == true) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DriverDashboard(),
+                                            ),
                                           );
-                                      if (response == true) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                StageMarshalDashboard(),
-                                          ),
-                                        );
+                                        }
+                      
                                         isLoading = !isLoading;
+                                      } else if (widget
+                                              .selectedRole //sign in a sacco official
+                                              .toLowerCase()
+                                              .toString() ==
+                                          'sacco_official') {
+                                        final response = await SaccoOfficial()
+                                            .signIn(
+                                              email: emailController.text,
+                                              password: passwordController.text,
+                                            );
+                                        if (response == true) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SaccoOfficialDashboard(),
+                                            ),
+                                          );
+                                          isLoading = !isLoading;
+                                        } else {
+                                          return;
+                                        }
+                                        isLoading = !isLoading;
+                                      } else if (widget.selectedRole
+                                              .toLowerCase()
+                                              .toString() ==
+                                          'stage_marshal') {
+                                        //sign in stage marshal
+                                        final response = await StageMarshal()
+                                            .signIn(
+                                              email: emailController.text,
+                                              id: int.tryParse(
+                                                stageMarshalIdController.text,
+                                              )!,
+                                            );
+                                        if (response == true) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  StageMarshalDashboard(),
+                                            ),
+                                          );
+                                          isLoading = !isLoading;
+                                        }
                                       }
                                     }
-                                  }
-                                },
-                                child: const Text('Login'),
-                              ),
-                        const SizedBox(height: 8),
-                        (widget.selectedRole.toLowerCase() ==
-                                    'sacco_official' ||
-                                widget.selectedRole.toLowerCase() ==
-                                    'matatu_owner')
-                            ? TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SignUpScreen(
-                                        selectedRole: widget.selectedRole,
-                                      ),
-                                    ),
-                                  ); // ✅ fixed
-                                },
-                                child: const Text(
-                                  "Don't have an account? Sign up",
+                                  },
+                                  child: const Text('Login'),
                                 ),
-                              )
-                            : Text(
-                                "No sign in available for ${widget.selectedRole}",
-                              ),
-                      ],
+                          const SizedBox(height: 8),
+                          (widget.selectedRole.toLowerCase() ==
+                                      'sacco_official' ||
+                                  widget.selectedRole.toLowerCase() ==
+                                      'matatu_owner')
+                              ? TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SignUpScreen(
+                                          selectedRole: widget.selectedRole,
+                                        ),
+                                      ),
+                                    ); // ✅ fixed
+                                  },
+                                  child: const Text(
+                                    "Don't have an account? Sign up",
+                                  ),
+                                )
+                              : Text(
+                                  "No sign in available for ${widget.selectedRole}",
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

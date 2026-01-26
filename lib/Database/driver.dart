@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Driver extends ChangeNotifier {
@@ -21,6 +22,7 @@ class Driver extends ChangeNotifier {
       if (response['vehicleId'] == vehicleId && response['nationalId'] == id) {
         currentUserId = response['nationalId'];
         Fluttertoast.showToast(msg: 'Login Success');
+        OneSignal.login(response['vehicleId']);
         notifyListeners();
         return true;
       }
@@ -36,23 +38,11 @@ class Driver extends ChangeNotifier {
       await supabase.from('QUEUE').insert({'vehicleId': vehicleNumber});
       Fluttertoast.showToast(msg: 'Check in Success');
     } on PostgrestException catch (dbError) {
-      if (dbError.message.contains('violates')) {
-        Fluttertoast.showToast(msg: 'Unregistered vehicle or Already Exists.');
-      } else {
-        Fluttertoast.showToast(msg: dbError.message);
-      }
+      Fluttertoast.showToast(msg: dbError.message);
     } catch (error) {
       Fluttertoast.showToast(msg: error.toString());
     }
   }
 
-  Future getDriverInfo() async {
-    Fluttertoast.showToast(msg: 'current id : $currentUserId');
-    final info = supabase
-        .from('DRIVER')
-        .select('*')
-        .eq('nationalId', currentUserId)
-        .maybeSingle();
-    return info;
-  }
+
 }

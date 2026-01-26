@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:queuetrack/AI/queue_analysis.dart';
 import 'package:queuetrack/Database/driver.dart';
 import 'package:queuetrack/screens/Driver/maps_view.dart';
 import '../dashboard_helper.dart';
@@ -13,10 +15,11 @@ class DriverDashboard extends StatelessWidget {
   final TextEditingController vehicleNumberController = TextEditingController();
 
   Future _checkInUi(BuildContext context) {
-    return showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return TextFormField(
+    return showDialog(context: context,
+        builder:(context){
+      return AlertDialog(
+        content: TextFormField(
+          textCapitalization: TextCapitalization.characters,
           controller: vehicleNumberController,
           keyboardType: TextInputType.text,
           decoration: const InputDecoration(
@@ -33,8 +36,9 @@ class DriverDashboard extends StatelessWidget {
             Driver().driverCheckIn(vehicleNumber: value);
             Navigator.pop(context);
           },
-        );
-      },
+        ),
+      );
+        }
     );
   }
 
@@ -86,16 +90,20 @@ class DriverDashboard extends StatelessWidget {
       },
     },
     {
-      'title': 'My Trip History',
-      'icon': Icons.history,
-      'color': Colors.orange,
-      'onTap': (ctx) => (ctx),
+      'title': 'Queue Analysis',
+      'icon': Icons.data_exploration,
+      'color': Colors.blue,
+      'onTap': (ctx) {
+        Navigator.push(
+          ctx,
+          MaterialPageRoute(builder: (_) => QueueAnalysis()),
+        );
+      },
     },
-
     {
       'title': 'Maps View',
       'icon': Icons.map_outlined,
-      'color': Colors.lightBlue,
+      'color': Colors.yellow[700],
       'onTap': (ctx)async {
         final List coordinates=await openGoogleMaps();
         if(coordinates.isEmpty){
@@ -104,6 +112,15 @@ class DriverDashboard extends StatelessWidget {
         }else{
         Navigator.push(ctx,MaterialPageRoute(builder: (ctx)=>MapsView(lat:coordinates[0] ,lng: coordinates[1], )));
         }
+      },
+    },
+    {
+      'title': 'Log Out',
+      'icon': Icons.logout,
+      'color': Colors.red,
+      'onTap': (ctx) async {
+        await OneSignal.logout();
+        Navigator.popUntil(context, ModalRoute.withName('/roleselection'));
       },
     },
   ], context);

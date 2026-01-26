@@ -18,7 +18,6 @@ class MatatuOwnerDashboard extends StatelessWidget {
             MaterialPageRoute(builder: (ctx) => MyVehicleLogsScreen()),
           ),
         },
-
         {
           'title': 'Register / Assign Vehicle',
           'icon': Icons.directions_bus,
@@ -27,6 +26,12 @@ class MatatuOwnerDashboard extends StatelessWidget {
             ctx,
             MaterialPageRoute(builder: (_) => const AssignVehicleScreen()),
           ),
+        },
+        {
+          'title': 'Log Out',
+          'icon': Icons.logout,
+          'color': Colors.red,
+          'onTap': (ctx) => Navigator.popUntil(ctx, ModalRoute.withName('/roleselection'))
         },
       ], context);
 }

@@ -1,17 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:queuetrack/AI/queue_analysis.dart';
 
 import 'package:queuetrack/Database/stage_marshal.dart';
-import 'package:queuetrack/pdf_logs/get_pdf_data.dart';
+import 'package:queuetrack/pdf_logs/preview_pdf.dart';
 import 'package:queuetrack/screens/SaccoOfficial/register_stage_marshal.dart';
 import 'package:queuetrack/screens/SaccoOfficial/view_departed_logs.dart';
 import '../dashboard_helper.dart';
 
 class SaccoOfficialDashboard extends StatelessWidget {
   const SaccoOfficialDashboard({super.key});
-
-  final String stageId = 'main_stage';
-
-  // -------------------- UTILITIES --------------------
 
   // -------------------- ACTIVE QUEUE --------------------
   void _viewActiveQueue(BuildContext context) {
@@ -74,20 +72,54 @@ class SaccoOfficialDashboard extends StatelessWidget {
 
   // -------------------- DASHBOARD --------------------
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[300],
-      appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        centerTitle: true,
-        title: Text('Sacco Dashboard'),
+  Widget build(BuildContext context) =>buildDashboard(
+    'Sacco Official Dashboard'
+  , [
+    {
+      'title': 'View Queue Status ',
+      'icon': Icons.queue,
+      'color': Colors.lightBlue,
+      'onTap': (ctx) => _viewActiveQueue(ctx),
+    },
+    {
+      'title': 'View Departed Queue ',
+      'icon': Icons.arrow_circle_left,
+      'color': Colors.orange,
+      'onTap': (ctx) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (ctx)=>ViewDepartedLogs() ),
       ),
-      body: Column(
-        children: [
-          Card()
-        ],
-      )
-    );
-  }
+    },{
+      'title': 'Register Stage Marshal',
+      'icon': Icons.app_registration_outlined,
+      'color': Colors.lightBlue,
+      'onTap': (ctx) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (ctx)=> RegisterStageMarshal()),
+      ),
+    },{
+      'title': 'Queue Analysis ',
+      'icon': Icons.data_exploration,
+      'color': Colors.orange[300],
+      'onTap': (ctx) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (ctx)=>QueueAnalysis()),
+      ),
+    },{
+      'title': 'Generate and Download Pdf ',
+      'icon': Icons.picture_as_pdf,
+      'color': Colors.lightBlue,
+      'onTap': (ctx) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (ctx)=> CreatePdf()),
+      ),
+    },
+    {
+      'title':'Log Out',
+      'icon':Icons.logout,
+      'color':Colors.red,
+      'onTap':(ctx) => Navigator.popUntil(context,ModalRoute.withName('/roleselection'))
+    }
+  ], context);
       
 }
