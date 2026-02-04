@@ -130,30 +130,6 @@ class _MapsViewState extends State<MapsView> {
               },
             ),
 
-            // ETA overlay
-            Positioned(
-              top: 12,
-              left: 12,
-              right: 12,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  'Estimated time to destination: $travelTimeText',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
           ],
         ),
       ),

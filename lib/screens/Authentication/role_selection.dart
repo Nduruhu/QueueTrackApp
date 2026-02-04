@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'login_page.dart';
+
 class RoleSelection extends StatefulWidget {
   const RoleSelection({super.key});
 
@@ -9,81 +9,198 @@ class RoleSelection extends StatefulWidget {
 }
 
 class _RoleSelectionState extends State<RoleSelection> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        title: ListTile(
-          titleAlignment: ListTileTitleAlignment.center,
 
-          title: Text(
-            'Karibu Queue Track',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 25
+  Widget _buildRoleCard({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.05), // Softer shadow for cleaner look
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, size: 28, color: Colors.blue.shade700),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87
+                    ),
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey.shade400)
+              ],
+            ),
           ),
-          subtitle: Text('Digital Queueing',style: TextStyle(color: Colors.black),),
         ),
       ),
-      backgroundColor: Colors.blue,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(50.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    );
+  }
 
-            children: [
-              Card(
-                elevation: 5,
-                child: ListTile(
-                    leading: Icon(Icons.badge,size: 40,),
-                    title: Text('Sacco Official'),
-                    onTap: (){
-                      //aende login page as sacco official
-                      Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => LoginPage(selectedRole: 'sacco_official',)));
-                    }
-                ),
-              ),
-              Divider(),
-              Card(elevation: 5,child: ListTile(
-                leading: Icon(Icons.person,size: 40,),
-                title: Text('Stage Marshal'),
-                onTap: (){
-                  //aende login page as stage marshal
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'stage_marshal',)));
-                },
-              )
-              ),
-              Divider(),
-              Card(elevation: 5,
-              child: ListTile(
-                leading: Icon(Icons.handshake,size: 40,),
-                title: Text('Matatu Owner'),
-                onTap: (){
-                  //aende login page as matatu owner
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'matatu_owner',)));
-                },
-              ),),
-              Divider(),
-              Card(
-                elevation: 5,
-                child: ListTile(
-                  leading: Icon(Icons.directions_car,size: 40,),
-                  title: Text('Driver'),
-                  onTap: (){
-                    //aende login page as driver
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(selectedRole: 'driver',)));
+  @override
+  Widget build(BuildContext context) {
+    // Match the primary color used in Login/SignUp
+    final Color primaryColor = Colors.blue.shade900;
 
-                  },
-                ),
-              )
-            ],
+    return Scaffold(
+      backgroundColor: primaryColor, // Blue background for the scaffold
+      body: Stack(
+        children: [
+          // 1. TOP SECTION (Blue Background)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).size.height * 0.35,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const Spacer(),
+
+                  // Same Logo as Sign Up Page (Size 50)
+                  const Icon(
+                    Icons.directions_bus_rounded,
+                    color: Colors.white,
+                    size: 70,
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Title in White
+                  const Text(
+                    'Karibu Queue Track',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Subtitle in Light Blue
+                  Text(
+                    'Select your role to continue',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue.shade100,
+                    ),
+                  ),
+
+                  const Spacer(flex: 2), // Push content slightly up
+                ],
+              ),
+            ),
           ),
-        ),
+
+          // 2. BOTTOM SECTION (Content Sheet)
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.30, // Start at 30%
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: const BoxDecoration(
+                // Using a very light grey so the White Cards stand out
+                color: Color(0xFFF3F4F6),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 30), // Padding inside the sheet
+                      Expanded(
+                        child: ListView(
+                          physics: const BouncingScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          children: [
+                            _buildRoleCard(
+                              title: 'Sacco Official',
+                              icon: Icons.badge_outlined,
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => LoginPage(selectedRole: 'sacco_official'))
+                                );
+                              },
+                            ),
+                            _buildRoleCard(
+                              title: 'Stage Marshal',
+                              icon: Icons.person_outline,
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => LoginPage(selectedRole: 'stage_marshal'))
+                                );
+                              },
+                            ),
+                            _buildRoleCard(
+                              title: 'Matatu Owner',
+                              icon: Icons.handshake_outlined,
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => LoginPage(selectedRole: 'matatu_owner'))
+                                );
+                              },
+                            ),
+                            _buildRoleCard(
+                              title: 'Driver',
+                              icon: Icons.directions_car_outlined,
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => LoginPage(selectedRole: 'driver'))
+                                );
+                              },
+                            ),
+                            // Extra space at bottom for scrolling
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
